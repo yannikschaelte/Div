@@ -1,2 +1,2 @@
-# Optimization
-Various optimization algorithms.
+# Div
+Temporary stuff from diverse projects.
