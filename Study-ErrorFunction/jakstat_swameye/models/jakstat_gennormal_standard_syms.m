@@ -62,9 +62,9 @@ model.sym.sigma_y(2) = sigma_tSTAT;
 model.sym.sigma_y(3) = sigma_pEpoR;
 
 %% Error function
-model.sym.Jy = sym(zeros(3,1));
+model.sym.Jy = sym(zeros(size(model.sym.y)));
 
-for j = 1:3
+for j = 1:length(model.sym.y)
 	model.sym.Jy(j) = sym(['log(2/shape*sigma_y_' num2str(j-1) '*1.7725) + abs((y_' num2str(j-1) '-my_' num2str(j-1) ')/(sigma_y_' num2str(j-1) '))^shape']);
 end
     

@@ -1,6 +1,6 @@
 function [parameters,options] = getParametersAndOptions_rafmekerk(approach)
 
-nStarts = 500;
+nStarts = 100;
 
 options.MS = PestoOptions();
 options.MS.n_starts = nStarts; % actually 500

@@ -1,4 +1,4 @@
-function [model] = rafmekerk_standard_syms()
+function [model] = rafmekerk_gennormal_standard_syms()
 
 %% CVODES OPTIONS
 % % absolute tolerance
@@ -29,7 +29,7 @@ syms kdf_Raf kp_Raf kdp_pMek kp_pRaf_Mek kdp_pErk kp_pMek_Erk K_pErk_inh ...
     scale_pMek_20140505_gel2 scale_pErk_20140505_gel2...
     sigma_pMek_20140430_gel1 sigma_pErk_20140430_gel1 sigma_pMek_20140430_gel2...
     sigma_pErk_20140430_gel2 sigma_pMek_20140505_gel1 sigma_pErk_20140505_gel1...
-    sigma_pMek_20140505_gel2 sigma_pErk_20140505_gel2
+    sigma_pMek_20140505_gel2 sigma_pErk_20140505_gel2 shape
 
 p = [kdf_Raf...
     kp_Raf...
@@ -52,7 +52,7 @@ p = [kdf_Raf...
 
 %% CONSTANTS
 syms Sora UO
-k = [Sora UO];
+k = [Sora UO shape];
 
 %% TIME EVOLUTION
 xdot = sym(zeros(size(x)));
@@ -91,5 +91,12 @@ model.sym.xdot = xdot;
 model.sym.x0 = x0;
 model.sym.y = y;
 model.sym.sigma_y = sigma_y;
+
+%% Error function
+model.sym.Jy = sym(zeros(size(model.sym.y)));
+
+for j = 1:length(model.sym.y)
+	model.sym.Jy(j) = sym(['log(2/shape*sigma_y_' num2str(j-1) '*1.7725) + abs((y_' num2str(j-1) '-my_' num2str(j-1) ')/(sigma_y_' num2str(j-1) '))^shape']);
+end
 
 end

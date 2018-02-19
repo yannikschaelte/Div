@@ -1,4 +1,8 @@
-function [  ] = run_rafmekerk(approach)
+function [  ] = run_rafmekerk(shape,approach)
+
+if nargin < 2
+    approach = 'standard';
+end
 
 exdir=fileparts(which('run_rafmekerk'));
 [parameters,options] = getParametersAndOptions_rafmekerk(approach);
@@ -6,7 +10,7 @@ exdir=fileparts(which('run_rafmekerk'));
 switch approach
     case 'standard'
         load data_rafmekerk_noreps.mat
-        nllh = @(x) nllh_rafmekerk_standard(x,D);
+        nllh = @(x) nllh_rafmekerk_standard(x,D,shape);
     case 'hierarchical'
         load data_rafmekerk.mat
         nllh = @(x) nllh_rafmekerk_hierarchical(x,D,options.sc);
