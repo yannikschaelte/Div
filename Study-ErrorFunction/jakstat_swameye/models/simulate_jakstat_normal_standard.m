@@ -1,13 +1,13 @@
-% simulate_jakstat_gennormal_standard.m is the matlab interface to the cvodes mex
+% simulate_jakstat_normal_standard.m is the matlab interface to the cvodes mex
 %   which simulates the ordinary differential equation and respective
 %   sensitivities according to user specifications.
 %   this routine was generated using AMICI commit 65b21e55803e53baf99ad77b9f15cef2afc2ccd7 in branch master in repo https://github.com/icb-dcm/amici.
 %
 % USAGE:
 % ======
-% [...] = simulate_jakstat_gennormal_standard(tout,theta)
-% [...] = simulate_jakstat_gennormal_standard(tout,theta,kappa,data,options)
-% [status,tout,x,y,sx,sy] = simulate_jakstat_gennormal_standard(...)
+% [...] = simulate_jakstat_normal_standard(tout,theta)
+% [...] = simulate_jakstat_normal_standard(tout,theta,kappa,data,options)
+% [status,tout,x,y,sx,sy] = simulate_jakstat_normal_standard(...)
 %
 % INPUTS:
 % =======
@@ -93,7 +93,7 @@
 % sol.sy ... time-resolved output sensitivity vector
 % sol.z ... event output
 % sol.sz ... sensitivity of event output
-function varargout = simulate_jakstat_gennormal_standard(varargin)
+function varargout = simulate_jakstat_normal_standard(varargin)
 
 % DO NOT CHANGE ANYTHING IN THIS FILE UNLESS YOU ARE VERY SURE ABOUT WHAT YOU ARE DOING
 % MANUAL CHANGES TO THIS FILE CAN RESULT IN WRONG SOLUTIONS AND CRASHING OF MATLAB
@@ -205,7 +205,7 @@ end
 if(max(options_ami.sens_ind)>17)
     error('Sensitivity index exceeds parameter dimension!')
 end
-if(length(kappa)<4)
+if(length(kappa)<2)
     error('provided condition vector is too short');
 end
 init = struct();
@@ -227,7 +227,7 @@ if(~isempty(options_ami.sx0))
     end
     init.sx0 = bsxfun(@times,options_ami.sx0,1./permute(chainRuleFactor(:),[2,1]));
 end
-sol = ami_jakstat_gennormal_standard(tout,theta(1:17),kappa(1:4),options_ami,plist,pbar(plist+1),xscale,init,data);
+sol = ami_jakstat_normal_standard(tout,theta(1:17),kappa(1:2),options_ami,plist,pbar(plist+1),xscale,init,data);
 if(nargout>1)
     varargout{1} = sol.status;
     varargout{2} = sol.t;

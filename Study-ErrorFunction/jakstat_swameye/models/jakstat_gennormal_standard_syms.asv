@@ -18,11 +18,11 @@ model.sym.x = [
     ];
 
 %% Parameters
-syms p1 p2 p3 p4 init_STAT Omega_cyt Omega_nuc sp1 sp2 sp3 sp4 sp5 offset_tSTAT offset_pSTAT scale_tSTAT scale_pSTAT sigma_pSTAT sigma_tSTAT sigma_pEpoR shape shape_gamma
+syms p1 p2 p3 p4 init_STAT Omega_cyt Omega_nuc sp1 sp2 sp3 sp4 sp5 offset_tSTAT offset_pSTAT scale_tSTAT scale_pSTAT sigma_pSTAT sigma_tSTAT sigma_pEpoR shape
 
 model.sym.p = [p1,p2,p3,p4,init_STAT,sp1,sp2,sp3,sp4,sp5,offset_tSTAT,offset_pSTAT,scale_tSTAT,scale_pSTAT,sigma_pSTAT,sigma_tSTAT,sigma_pEpoR];
 model.param = 'log10';
-model.sym.k = [Omega_cyt,Omega_nuc shape shape_gamma];
+model.sym.k = [Omega_cyt,Omega_nuc shape];
 
 %% Inputs
 syms t
@@ -65,7 +65,7 @@ model.sym.sigma_y(3) = sigma_pEpoR;
 model.sym.Jy = sym(zeros(size(model.sym.y)));
 
 for j = 1:length(model.sym.y)
-	model.sym.Jy(j) = sym(['log(2/shape*sigma_y_' num2str(j-1) '*shape_gamma) + abs((y_' num2str(j-1) '-my_' num2str(j-1) ')/(sigma_y_' num2str(j-1) '))^shape']);
+	model.sym.Jy(j) = sym(['log(2/shape*sigma_y_' num2str(j-1) '*' num2str(gamma(1/shape) + abs((y_' num2str(j-1) '-my_' num2str(j-1) ')/(sigma_y_' num2str(j-1) '))^shape']);
 end
     
 end

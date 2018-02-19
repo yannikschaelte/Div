@@ -33,7 +33,7 @@ for ie = 1:n_e
         amiData.t = D(ie).t;
         amiData.Y = D(ie).Y(:,:,ir);
         amiData.Sigma_Y = nan(size(amiData.Y));
-        amiData.condition = [D(ie).k(:); shape];
+        amiData.condition = [D(ie).k(:); shape; gamma(1/shape)];
         amiData = amidata(amiData);
         
         sol = simulate_jakstat_gennormal_standard([], theta, [], amiData, amiOptions);
@@ -44,7 +44,7 @@ for ie = 1:n_e
         
         switch amiOptions.sensi
             case 0
-                varargout{1} = varargout{1} - sol.llh ;
+                varargout{1} = varargout{1} - sol.llh;
             case 1
                 varargout{1} = varargout{1} - sol.llh;
                 varargout{2} = varargout{2} - sol.sllh;
