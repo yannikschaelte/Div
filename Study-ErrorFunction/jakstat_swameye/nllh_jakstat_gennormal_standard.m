@@ -1,4 +1,4 @@
-function [ varargout ] = nllh_jakstat_standard(theta, D)
+function [ varargout ] = nllh_jakstat_gennormal_standard(theta, D, shape)
 
 amiOptions.rtol = 1e-10;
 amiOptions.atol = 1e-10;
@@ -33,10 +33,10 @@ for ie = 1:n_e
         amiData.t = D(ie).t;
         amiData.Y = D(ie).Y(:,:,ir);
         amiData.Sigma_Y = nan(size(amiData.Y));
-        amiData.condition = D(ie).k(:);
+        amiData.condition = [D(ie).k(:); shape];
         amiData = amidata(amiData);
         
-        sol = simulate_jakstat([], theta, [], amiData, amiOptions);
+        sol = simulate_jakstat_gennormal_standard([], theta, [], amiData, amiOptions);
         
         if (sol.status ~= 0)
             error('Could not integrate ODE.');
@@ -44,7 +44,7 @@ for ie = 1:n_e
         
         switch amiOptions.sensi
             case 0
-                varargout{1} = varargout{1} - sol.llh;
+                varargout{1} = varargout{1} - sol.llh ;
             case 1
                 varargout{1} = varargout{1} - sol.llh;
                 varargout{2} = varargout{2} - sol.sllh;

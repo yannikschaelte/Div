@@ -1,4 +1,8 @@
-function [  ] = run_jakstat(approach)
+function [  ] = run_jakstat(shape,approach)
+
+if nargin < 2
+    approach = 'standard';
+end
 
 load('data_jakstat','D');
 
@@ -7,7 +11,7 @@ exdir=fileparts(which('run_jakstat.m'));
 
 switch approach
     case 'standard'
-        nllh = @(x) nllh_jakstat_standard(x,D);
+        nllh = @(x) nllh_jakstat_gennormal_standard(x,D,shape);
     case 'hierarchical'
         nllh = @(x) nllh_jakstat_hierarchical(x,D,options.sc);
     case 'hierarchical-adjoint'
@@ -22,7 +26,7 @@ end
 
 parameters_res = getMultiStarts(parameters,nllh,options.MS);
 
-save(fullfile(exdir,['results_' approach '.mat']));
+save(fullfile(exdir,['results_' num2str(shape) '_' approach '.mat']));
 
 end
 

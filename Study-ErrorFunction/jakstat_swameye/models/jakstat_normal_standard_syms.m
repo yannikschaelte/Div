@@ -1,4 +1,4 @@
-function [model] = jakstat_standard_syms()
+function [model] = jakstat_normal_standard_syms()
 % jakstat_pesto_syms for examples/jakstat_signaling
 %
 % creates an amimodel-object for the AMICI solver
@@ -65,7 +65,7 @@ model.sym.sigma_y(3) = sigma_pEpoR;
 model.sym.Jy = sym(zeros(3,1));
 
 for j = 1:3
-	model.sym.Jy(j) = 
+	model.sym.Jy(j) = sym(['0.5*log(2*pi*sigma_y_' num2str(j-1) '^2) + 0.5*((y_' num2str(j-1) '-my_' num2str(j-1) ')/sigma_y_' num2str(j-1) ')^2']);
 end
     
 end
