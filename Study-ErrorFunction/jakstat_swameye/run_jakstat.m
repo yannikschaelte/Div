@@ -1,11 +1,17 @@
-function [  ] = run_jakstat(shape,approach)
+function [  ] = run_jakstat(shape,outlier,approach)
 
-if nargin < 2
+if nargin < 3
     approach = 'standard';
 end
 
-load('data_jakstat','D');
-
+if outlier
+    load('data_jakstat_outlier','D');
+    outlier = '_outlier';
+else
+    load('data_jakstat','D');
+    outlier = '';
+end
+    
 exdir=fileparts(which('run_jakstat.m'));
 [parameters,options] = getParametersAndOptions_jakstat(approach);
 
@@ -26,7 +32,7 @@ end
 
 parameters_res = getMultiStarts(parameters,nllh,options.MS);
 
-save(fullfile(exdir,['results_' num2str(shape) '_' approach '.mat']));
+save(fullfile(exdir,['results_' num2str(shape) outlier '_' approach '.mat']));
 
 end
 
