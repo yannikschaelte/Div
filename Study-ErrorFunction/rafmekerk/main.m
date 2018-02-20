@@ -1,5 +1,7 @@
 %% Preliminaries
 
+close all;
+clear;
 exdir=fileparts(which('run_rafmekerk.m'));
 addpath(fullfile(exdir,'models'));
 addpath(fullfile(exdir,'data'));
