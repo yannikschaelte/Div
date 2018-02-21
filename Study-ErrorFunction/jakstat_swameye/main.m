@@ -10,28 +10,29 @@ addpath(fullfile(exdir,'data'));
 
 shapes = {1,1.1,1.5,1.7,2,3};
 nShapes = length(shapes);
-for j = 1:nShapes
-    run_jakstat(shapes{j},false);
-    run_jakstat(shapes{j},true);
-end
+% for j = 1:nShapes
+%     run_jakstat(shapes{j},false);
+%     run_jakstat(shapes{j},true);
+% end
 
 %% Analyze
 
-load('data_jakstat.mat','D');
+load('data_jakstat_outlier.mat','D');
 
 amiOptions.rtol = 1e-10;
 amiOptions.atol = 1e-10;
 amiOptions.sensi_meth = 'forward';
 amiOptions.sensi = 0;
 
+for outlier = {'','_outlier'}
 for is = 1:nShapes
     shape = shapes{is};
     
-    filename = ['results_' num2str(shape) '_standard.mat'];
+    filename = ['results_' num2str(shape) outlier '_standard.mat'];
     if ~exist(filename,'file')
         continue;
     end
-    load(['results_' num2str(shape) '_standard.mat'],'parameters_res');
+    load(filename,'parameters_res');
     theta = parameters_res.MS.par(:,1);
     fprintf('logPost %s = %.10f\n',num2str(shape),parameters_res.MS.logPost(1));
 
@@ -44,7 +45,7 @@ for is = 1:nShapes
     sol = simulate_jakstat_gennormal_standard([], theta, [], amiData, amiOptions);
 
     for iy = 1:size(D(1).Y,2)
-        fig = figure('name',['fit_jakstat_' num2str(shape) '_' num2str(iy)]);
+        fig = figure('name',['fit_jakstat_' num2str(shape) outlier '_' num2str(iy)]);
         plot(D(1).t,sol.y(:,iy));
         hold on;
         plot(D(1).t,D(1).Y(:,iy,1),'.');
@@ -58,4 +59,5 @@ for is = 1:nShapes
         ycorr = corr(ym,y);
         fprintf('correlation %s = %.10f\n',num2str(shape),ycorr);
     end
+end
 end
