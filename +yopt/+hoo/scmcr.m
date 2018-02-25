@@ -52,7 +52,7 @@ jIter = 1;
 jFunEvals = 1;
 
 % check if function differentiable at start point
-if isnan(fval) || isinf(fval) || any(isnan(g)) || any(isinf(g)) || any(any(isnan(H))) || any(any(isinf(H)))
+if ~isfinite(fval) || ~all(isfinite(g)) || ~all(all(isfinite(H)))
     return;
 end
 
@@ -62,6 +62,8 @@ end
 [Q,D] = schur(H);
 b = Q'*g;
 gnorm = norm(g,2);
+snorm = inf;
+absfvaldiff = inf;
 
 % reserve space for solution of rotated problem
 y = zeros(n,1);
@@ -71,7 +73,7 @@ bounded_fun = @(x,jIter) bound_fun(x,fun,lb,ub,barrier,jIter,maxIter);
 
 % main loop
 % TODO also add conditions for steplength and minimum (negative) eigenvalue
-while gnorm > tol && jIter < maxIter && jFunEvals < maxFunEvals
+while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFunEvals < maxFunEvals
     jIter = jIter + 1;
     
     % solve trust-region subproblem
@@ -81,59 +83,69 @@ while gnorm > tol && jIter < maxIter && jFunEvals < maxFunEvals
     end
     
     % try step
-    s = Q*y;fprintf('%d %.15f %.15f %.15f %f \n',jIter,fval,gnorm,norm(s),sigma);
+    s = Q*y;
     x_new = x + s;
     fval_new = bounded_fun(x_new,jIter);
-    if isnan(fval_new) || isinf(fval_new) || fval_new > fval - alpha * sum(abs(y).^3)
+    snorm = norm(s,2);
+    
+    fval_diff = fval_new - fval; % desired: improvement < 0
+    predicted_fval_diff = g(:)'*s + 0.5*s'*H*s;
+    
+    predictionRatio = fval_diff / predicted_fval_diff;
+    disp(num2str(predictionRatio));
+    
+    if ~isfinite(fval_new) || fval_diff > - alpha * sum(abs(y).^3)
         % no success: increase sigma
         sigma = max([sigma_small,sigma_factor*sigma]);
-    else
-        % success: update values
-        % TODO: decrease sigma?
-        sigma = sigma/(sigma_factor/1);
-        
-        % also compute derivatives
-        % TODO: we compute fval_new twice, little overhead
-        [fval_new,g_new,H_new] = fun(x_new);
-        jFunEvals = jFunEvals + 1;
-        
-        % check validity
-        if isnan(fval_new) || isinf(fval_new)...
-                || any(isnan(g_new)) || any(isinf(g_new))...
-                || any(any(isnan(H_new))) || any(any(isinf(H_new)))
-            sigma = max([sigma_small,sigma_factor*sigma]);
-        else
-            % update values
-            [Q_new,D_new] = schur(H_new);
-            
-            % update rho inspired by a third-order secant equation
-            denominator = Q_new'*s;
-            for j=1:n
-                dj = denominator(j);
-                if -epsilon < dj && dj <= 0
-                    denominator(j) = -epsilon;
-                elseif 0 < dj && dj < epsilon
-                    denominator(j) = epsilon;
-                end
-            end
-            rho = diag((D_new-Q_new'*H*Q_new))./denominator;
-            
-            % keep rho within bounds
-            rho = min(max(rho,rhomin),rhomax);
-            
-            % update running variables
-            x = x_new;
-            fval = fval_new;
-            g = g_new;
-            H = H_new;
-            Q = Q_new;
-            D = D_new;
-            gnorm = norm(g,2);
-            
-            b = Q'*g;
+        % if somehow better, adapt
+        if fval_new >= fval
+            continue;
         end
+    else
+        sigma = sigma/sigma_factor;
+        absfvaldiff = abs(fval_diff);
     end
+    
+    % also compute derivatives
+    [fval_new,g_new,H_new] = fun(x_new);
+    jFunEvals = jFunEvals + 1; % funEvals means with derivatives
+    
+    % check validity
+    if ~isfinite(fval_new) || ~all(isfinite(g_new)) || ~all(all(isfinite(H_new)))
+        sigma = max([sigma_small,sigma_factor*sigma]);
+    else
+        % update values
+        [Q_new,D_new] = schur(H_new);
+        
+        % update rho inspired by a third-order secant equation
+        denominator = Q_new'*s;
+        for j=1:n
+            dj = denominator(j);
+            if -epsilon < dj && dj <= 0
+                denominator(j) = -epsilon;
+            elseif 0 < dj && dj < epsilon
+                denominator(j) = epsilon;
+            end
+        end
+        rho = diag((D_new-Q_new'*H*Q_new))./denominator;
+        
+        % keep rho within bounds
+        rho = min(max(rho,rhomin),rhomax);
+        
+        % update running variables
+        x = x_new;
+        fval = fval_new;
+        g = g_new;
+        H = H_new;
+        Q = Q_new;
+        D = D_new;
+        gnorm = norm(g,2);
+        
+        b = Q'*g;
+    end
+    fprintf('%d %.15f \n',jIter,fval);
 end
+
 
 % meta information
 if gnorm >= tol
