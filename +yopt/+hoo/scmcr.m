@@ -92,7 +92,12 @@ while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFun
     predicted_fval_diff = g(:)'*s + 0.5*s'*H*s;
     
     predictionRatio = fval_diff / predicted_fval_diff;
-    disp(num2str(predictionRatio));
+%     disp(num2str(predictionRatio));
+    if predictionRatio > 0.9
+        Delta = min([Delta*1.1,4]);
+    elseif predictionRatio < 0.25
+        Delta = max([Delta*0.9,1]);
+    end
     
     if ~isfinite(fval_new) || fval_diff > - alpha * sum(abs(y).^3)
         % no success: increase sigma
@@ -102,7 +107,7 @@ while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFun
             continue;
         end
     else
-        sigma = sigma/sigma_factor;
+        sigma = sigma/10;
         absfvaldiff = abs(fval_diff);
     end
     
@@ -143,7 +148,10 @@ while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFun
         
         b = Q'*g;
     end
-    fprintf('%d %.15f \n',jIter,fval);
+    if mod(jIter,20) == 0
+        fprintf('Iter.\tfval\tDelta\tsnorm\tpredictionRatio--------\n');
+    end
+    fprintf('%d\t%.15f\t%.15f\t%.15f\t%.15f\n',jIter,fval,Delta,snorm,predictionRatio);
 end
 
 
