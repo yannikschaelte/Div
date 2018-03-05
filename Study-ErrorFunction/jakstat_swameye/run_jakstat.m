@@ -4,14 +4,7 @@ if nargin < 3
     approach = 'standard';
 end
 
-if outlier
-    load('data_jakstat_outlier','D');
-    outlier = '_outlier';
-else
-    load('data_jakstat','D');
-    outlier = '';
-end
-    
+load(['data_jakstat' outlier],'D');
 exdir=fileparts(which('run_jakstat.m'));
 [parameters,options] = getParametersAndOptions_jakstat(approach);
 

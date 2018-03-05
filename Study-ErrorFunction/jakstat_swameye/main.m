@@ -11,8 +11,8 @@ addpath(fullfile(exdir,'data'));
 shapes = {1,1.1,1.5,1.7,2,3};
 nShapes = length(shapes);
 for j = 1:nShapes
-    run_jakstat(shapes{j},false);
-    run_jakstat(shapes{j},true);
+%     run_jakstat(shapes{j},'');
+%     run_jakstat(shapes{j},'_outlier2');
 end
 
 %% Analyze

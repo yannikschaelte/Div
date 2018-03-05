@@ -11,13 +11,13 @@ addpath(fullfile(exdir,'data'));
 shapes = {1,1.1,1.5,1.7,2,3};
 nShapes = length(shapes);
 for j = 1:nShapes
-    run_rafmekerk(shapes{j},false);
-    run_rafmekerk(shapes{j},true);
+%     run_rafmekerk(shapes{j},false);
+%     run_rafmekerk(shapes{j},true);
 end
 
 %% Analyze
 
-load('data_jakstat.mat','D');
+load('data_rafmekerk_noreps.mat','D');
 
 amiOptions.rtol = 1e-10;
 amiOptions.atol = 1e-10;
@@ -25,7 +25,7 @@ amiOptions.sensi_meth = 'forward';
 amiOptions.sensi = 0;
 
 cell_outlier = {'','_outlier'};
-for io = 1:length(cell_outlier);
+for io = 1:length(cell_outlier)
     outlier = cell_outlier{io};
 for is = 1:nShapes
     shape = shapes{is};
@@ -47,7 +47,7 @@ for is = 1:nShapes
     sol = simulate_rafmekerk_gennormal_standard([], theta, [], amiData, amiOptions);
 
     for iy = 1:size(D(1).Y,2)
-        fig = figure('name',['fit_jakstat_' num2str(shape) outlier '_' num2str(iy)]);
+        fig = figure('name',['fit_rme_' num2str(shape) outlier '_' num2str(iy)]);
         plot(D(1).t,sol.y(:,iy));
         hold on;
         plot(D(1).t,D(1).Y(:,iy,1),'.');
