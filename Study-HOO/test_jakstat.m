@@ -37,6 +37,8 @@ switch optimizer
         options.MaxFunEvals = maxFunEvals;
         options.MaxIter = maxIter;
         [x,fval,meta] = yopt.hoo.scmcr(fun,x0,options);
+    case 'scmtr_src'
+        [x,fval,meta] = yopt.hoo.scmtr_src(fun,x0);
     case 'Noodles'
         options = struct();
         options.tolGrad = tolX;

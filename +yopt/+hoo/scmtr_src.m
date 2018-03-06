@@ -1,4 +1,4 @@
-function [x,fval,output] = scmtr_src(fun,x0,options)
+function [x,fval,meta] = scmtr_src(fun,x0,options)
 % Method for unconstrained optimization via a trust-region approach using a
 % separable cubic model. Based on [Separable cubic modeling and a
 % trust-region strategy for unconstrained minimization with impact in lobal
@@ -11,38 +11,28 @@ function [x,fval,output] = scmtr_src(fun,x0,options)
 %   x0      : start parameters for local search
 %   options : algorithm options
 
+% unit roundoff
+roundoff = sqrt(eps);
+
 % initialize values
 x = x0(:);
 n = size(x,1);
 
-% initialize meta data
-output.exitflag = -1;
-fval = nan;
-output.g = nan(n,1);
-output.H = nan(n,n);
-output.iterations = 0;
-output.funEvals = 0;
-
-% unit roundoff
-epsilon = sqrt(eps);
-
 % parameters
 if nargin < 3, options = struct(); end
 options = getOptions(n,options);
-output.options = options;
-
-% check feasibility of starting point
-if any(x<lb) || any(x>ub)
-    return;
-end
+meta.options = options;
 
 % function value and derivatives at start point
 [fval,g,H] = fun(x);
-jIter = 1;
-jFunEvals = 1;
-
+% initialize output
+meta.g = g;
+meta.H = H;
+meta.iter = 0;
+meta.funEvals = 1;
 % check if function differentiable at start point
 if ~isfinite(fval) || ~all(isfinite(g)) || ~all(all(isfinite(H)))
+    meta.exitflag = -1;
     return;
 end
 
@@ -52,62 +42,63 @@ end
 [Q,D] = schur(H);
 b = Q'*g;
 gnorm = norm(g,2);
-snorm = inf;
-absfvaldiff = inf;
-
+delta = options.delta0;
+rho = options.rho0;
 % reserve space for solution of rotated problem
 y = zeros(n,1);
 
-% wrap function with barrier
-bounded_fun = @(x,jIter) bound_fun(x,fun,lb,ub,barrier,jIter,maxIter);
-
 % main loop
-% TODO also add conditions for steplength and minimum (negative) eigenvalue
-while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFunEvals < maxFunEvals
-    jIter = jIter + 1;
+while gnorm > options.tol ...
+        && meta.iter < options.maxIter ...
+        && meta.funEvals < options.maxFunEvals
+    
+    % increment iteration counter
+    meta.iter = meta.iter + 1;
+    
+    % output
+    if options.verbosity ~= 0
+        if mod(meta.iter,20) == 0
+            fprintf('iter\tfunEvals\tfval--------\n');
+        end
+        fprintf('%d\t%d\t%.6e\n',meta.iter,meta.funEvals,fval);
+    end
     
     % solve trust-region subproblem
     for j=1:n
-        c0=0;c1=b(j);c2=D(j,j)/2;c3=rho(j)/6;c4=sigma/6;
-        y(j) = minPoly(c0,c1,c2,c3,c4,-Delta,Delta);
+        c0=0;c1=b(j);c2=D(j,j)/2;c3=rho(j)/6;
+        y(j) = minPoly(c0,c1,c2,c3,0,-delta,delta);
     end
     
-    % try step
+    % compute step
     s = Q*y;
-    x_new = x + s;
-    fval_new = bounded_fun(x_new,jIter);
-    snorm = norm(s,2);
+    fval_new = fun(x+s);
     
-    fval_diff = fval_new - fval; % desired: improvement < 0
-    predicted_fval_diff = g(:)'*s + 0.5*s'*H*s;
+    % evaluate step
+    fval_diff = fval - fval_new;
+    q = fval + g'*s + 0.5*s'*H*s;
+    pred_diff = fval - q;
+    ratio = fval_diff / pred_diff;
     
-    predictionRatio = fval_diff / predicted_fval_diff;
-%     disp(num2str(predictionRatio));
-    if predictionRatio > 0.9
-        Delta = min([Delta*1.1,4]);
-    elseif predictionRatio < 0.25
-        Delta = max([Delta*0.9,1]);
-    end
-    
-    if ~isfinite(fval_new) || fval_diff > - alpha * sum(abs(y).^3)
-        % no success: increase sigma
-        sigma = max([sigma_small,sigma_factor*sigma]);
-        % if somehow better, adapt
-        if fval_new >= fval
-            continue;
-        end
+    % evaluate ratio
+    if ratio >= options.eta_v
+        x_new = x + s;
+        delta_new = options.gamma * delta;
+    elseif ratio >= options.eta_s
+        x_new = x + s;
+        delta_new = delta;
     else
-        sigma = sigma/10;
-        absfvaldiff = abs(fval_diff);
+        delta = options.gamma_d * delta;
+        continue;
     end
     
-    % also compute derivatives
-    [fval_new,g_new,H_new] = fun(x_new);
-    jFunEvals = jFunEvals + 1; % funEvals means with derivatives
+    % x has changed, so also compute derivatives
+    [fval_new,g_new,H_new] = fun(x);
+    meta.funEvals = meta.funEvals + 1;
     
     % check validity
     if ~isfinite(fval_new) || ~all(isfinite(g_new)) || ~all(all(isfinite(H_new)))
-        sigma = max([sigma_small,sigma_factor*sigma]);
+        % treat like failed step
+        delta = options.gamma_d * delta;
     else
         % update values
         [Q_new,D_new] = schur(H_new);
@@ -115,17 +106,17 @@ while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFun
         % update rho inspired by a third-order secant equation
         denominator = Q_new'*s;
         for j=1:n
-            dj = denominator(j);
-            if -epsilon < dj && dj <= 0
-                denominator(j) = -epsilon;
-            elseif 0 < dj && dj < epsilon
-                denominator(j) = epsilon;
+            denominator_j = denominator(j);
+            if -roundoff < denominator_j && denominator_j <= 0
+                denominator(j) = -roundoff;
+            elseif 0 < denominator_j && denominator_j < roundoff
+                denominator(j) = roundoff;
             end
         end
         rho = diag((D_new-Q_new'*H*Q_new))./denominator;
         
         % keep rho within bounds
-        rho = min(max(rho,rhomin),rhomax);
+        rho = min(max(rho,options.rho_min),options.rho_max);
         
         % update running variables
         x = x_new;
@@ -135,28 +126,23 @@ while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFun
         Q = Q_new;
         D = D_new;
         gnorm = norm(g,2);
+        delta = delta_new;
         
         b = Q'*g;
     end
-    if mod(jIter,20) == 0
-        fprintf('Iter.\tfval\tDelta\tsnorm\tpredictionRatio--------\n');
-    end
-    fprintf('%d\t%.15f\t%.15f\t%.15f\t%.15f\n',jIter,fval,Delta,snorm,predictionRatio);
+    
 end
-
 
 % meta information
 if gnorm >= tol
     % did not converge
-    output.exitflag = 0;
+    meta.exitflag = 0;
 else
-    output.exitflag = 1;
+    meta.exitflag = 1;
 end
-output.algorithm = 'rsc';
-output.iterations = jIter;
-output.funEvals = jFunEvals;
-output.g = g;
-output.H = H;
+meta.algorithm = 'scmtr_src';
+meta.g = g;
+meta.H = H;
 
 end
 
@@ -224,6 +210,7 @@ options = struct();
 % default options
 options.rho0        = 1*ones(n,1);
 options.rho_max     = 1e3;
+options.rho_min     = -options.rho_max;
 options.delta0      = 2;
 options.delta_min   = 0.1;
 options.delta_max   = 1e5;
@@ -234,11 +221,13 @@ options.gamma_d     = 0.5;
 options.tol         = 1e-8;
 
 % additional options
-options.maxFunEvals = 1000;
+options.maxIter     = Inf;
+options.maxFunEvals = inf;
+options.verbosity   = 1;
 
 % fill from input
 cell_fieldnames = fieldnames(options);
-cell_fieldnames_in = cell_fieldnames(options_in);
+cell_fieldnames_in = fieldnames(options_in);
 
 for jf=1:length(cell_fieldnames_in)
     fieldname = cell_fieldnames_in{jf};
