@@ -17,6 +17,26 @@ end
 
 %% Analyze
 
+cell_outlier = {'','_outlier'};
+markers = {'o','+','*','x','s','d','^','v','<','>','p','h','o','+','*','x','s','d','^','v','<','>','p','h','o','+','*','x','s','d','^','v','<','>','p','h'};
+
+% waterfalls
+figure('name','waterfalls-rme');
+for io = 1:length(cell_outlier)
+    outlier = cell_outlier{io};
+    for is = 1:nShapes
+        shape = shapes{is};
+        filename = ['results_' num2str(shape) outlier '_standard.mat'];
+        if ~exist(filename,'file')
+            continue;
+        end
+        load(filename,'parameters_res');
+        semilogy(parameters_res.MS.logPost,[markers{is} '-'],'DisplayName',[num2str(shape) outlier]);
+        hold on;
+    end
+end
+legend('show');
+
 load('data_rafmekerk_noreps.mat','D');
 
 amiOptions.rtol = 1e-10;
@@ -24,7 +44,6 @@ amiOptions.atol = 1e-10;
 amiOptions.sensi_meth = 'forward';
 amiOptions.sensi = 0;
 
-cell_outlier = {'','_outlier'};
 for io = 1:length(cell_outlier)
     outlier = cell_outlier{io};
 for is = 1:nShapes
