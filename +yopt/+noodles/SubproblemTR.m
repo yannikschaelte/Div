@@ -1,5 +1,5 @@
-classdef Subproblem
-    %SUBPROBLEM Summary of this class goes here
+classdef SubproblemTR < NoodleSubproblem
+    %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
@@ -7,8 +7,8 @@ classdef Subproblem
     end
     
     methods
-        function obj = Subproblem(inputArg1,inputArg2)
-            %SUBPROBLEM Construct an instance of this class
+        function obj = untitled(inputArg1,inputArg2)
+            %UNTITLED Construct an instance of this class
             %   Detailed explanation goes here
             obj.Property1 = inputArg1 + inputArg2;
         end
@@ -18,6 +18,15 @@ classdef Subproblem
             %   Detailed explanation goes here
             outputArg = obj.Property1 + inputArg;
         end
+    end
+    
+    methods (Static)
+        
+        function options = get_options(options_in)
+            options = get_options@NoodleOptions();
+            
+        end
+        
     end
 end
 
