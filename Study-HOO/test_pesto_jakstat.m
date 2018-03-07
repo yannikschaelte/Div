@@ -10,7 +10,7 @@ fun = @(x) nllh_jakstat(x,D);
 parameters = get_parameters_jakstat();
 
 options = PestoOptions();
-options.n_starts = 5;
+options.n_starts = 20;
 options.mode = 'text';
 options.localOptimizer = optimizer;
 options.localOptimizerOptions = local_options(optimizer,parameters);
@@ -45,6 +45,12 @@ switch optimizer
         local_options.TolX = tolX;
         local_options.GradObj = 'on';
         local_options.PrecondBandWidth = Inf;
+    case 'scmtr_src'
+        local_options = struct();
+        local_options.maxFunEvals = maxFunEvals;
+    case 'scmcr_src'
+        local_options = struct();
+        local_options.maxFunEvals = maxFunEvals;
     case 'scmcr'
         local_options = struct();
         local_options.Lb = lb;

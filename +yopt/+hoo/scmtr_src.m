@@ -10,31 +10,35 @@ function [x,fval,meta] = scmtr_src(fun,x0,options)
 %             matrix at x
 %   x0      : start parameters for local search
 %   options : algorithm options
+%
+% Output:
+%   x       : parameters for best found function value
+%   fval    : best found function value, fun(x)
+%   meta    : additional run information
 
-% unit roundoff
-roundoff = sqrt(eps);
-
-% initialize values
+% initialize values at starting point
 x = x0(:);
 n = size(x,1);
 
 % parameters
 if nargin < 3, options = struct(); end
-options = getOptions(n,options);
+options = get_options(n,options);
 meta.options = options;
 
-% function value and derivatives at start point
+% function value and derivatives at starting point
 [fval,g,H] = fun(x);
 % initialize output
 meta.g = g;
 meta.H = H;
 meta.iter = 0;
 meta.funEvals = 1;
-% check if function differentiable at start point
+% check if function differentiable at starting point
 if ~isfinite(fval) || ~all(isfinite(g)) || ~all(all(isfinite(H)))
     meta.exitflag = -1;
     return;
 end
+
+% initialize further starting point variables
 
 % [Q,T] = schur(A) where A = Q*T*Q', Q unitary, T (Schur form)
 % upper triangular. Can be computed e.g. via QR. For symmetric matrices,
@@ -44,8 +48,8 @@ b = Q'*g;
 gnorm = norm(g,2);
 delta = options.delta0;
 rho = options.rho0;
-% reserve space for solution of rotated problem
-y = zeros(n,1);
+roundoff = sqrt(eps); % unit roundoff
+y = zeros(n,1); % space for solution of rotated problem
 
 % main loop
 while gnorm > options.tol ...
@@ -57,8 +61,8 @@ while gnorm > options.tol ...
     
     % output
     if options.verbosity ~= 0
-        if mod(meta.iter,20) == 0
-            fprintf('iter\tfunEvals\tfval--------\n');
+        if mod(meta.iter,10) == 0
+            fprintf('it.\tfe.\tfval\n');
         end
         fprintf('%d\t%d\t%.6e\n',meta.iter,meta.funEvals,fval);
     end
@@ -71,7 +75,8 @@ while gnorm > options.tol ...
     
     % compute step
     s = Q*y;
-    fval_new = fun(x+s);
+    x_new = x + s;
+    fval_new = fun(x_new);
     
     % evaluate step
     fval_diff = fval - fval_new;
@@ -80,71 +85,68 @@ while gnorm > options.tol ...
     ratio = fval_diff / pred_diff;
     
     % evaluate ratio
-    if ratio >= options.eta_v
-        x_new = x + s;
+    if isfinite(fval_new) && fval_diff > 0 && ratio >= options.eta_v
         delta_new = options.gamma * delta;
-    elseif ratio >= options.eta_s
-        x_new = x + s;
+    elseif isfinite(fval_new) && fval_diff > 0 && ratio >= options.eta_s
         delta_new = delta;
     else
         delta = options.gamma_d * delta;
         continue;
     end
     
-    % x has changed, so also compute derivatives
-    [fval_new,g_new,H_new] = fun(x);
+    % move to better x, so also compute derivatives
+    [fval_new,g_new,H_new] = fun(x_new);
     meta.funEvals = meta.funEvals + 1;
     
     % check validity
     if ~isfinite(fval_new) || ~all(isfinite(g_new)) || ~all(all(isfinite(H_new)))
         % treat like failed step
         delta = options.gamma_d * delta;
-    else
-        % update values
-        [Q_new,D_new] = schur(H_new);
-        
-        % update rho inspired by a third-order secant equation
-        denominator = Q_new'*s;
-        for j=1:n
-            denominator_j = denominator(j);
-            if -roundoff < denominator_j && denominator_j <= 0
-                denominator(j) = -roundoff;
-            elseif 0 < denominator_j && denominator_j < roundoff
-                denominator(j) = roundoff;
-            end
-        end
-        rho = diag((D_new-Q_new'*H*Q_new))./denominator;
-        
-        % keep rho within bounds
-        rho = min(max(rho,options.rho_min),options.rho_max);
-        
-        % update running variables
-        x = x_new;
-        fval = fval_new;
-        g = g_new;
-        H = H_new;
-        Q = Q_new;
-        D = D_new;
-        gnorm = norm(g,2);
-        delta = delta_new;
-        
-        b = Q'*g;
+        continue;
     end
     
+    % update values
+    [Q_new,D_new] = schur(H_new);
+    
+    % update rho inspired by a third-order secant equation
+    den = Q_new'*s;
+    for j=1:n
+        den_j = den(j);
+        if -roundoff < den_j && den_j <= 0
+            den(j) = -roundoff;
+        elseif 0 < den_j && den_j < roundoff
+            den(j) = roundoff;
+        end
+    end
+    rho = diag((D_new-Q_new'*H*Q_new))./den;
+    
+    % keep rho within bounds
+    rho = min(max(rho,options.rho_min),options.rho_max);
+    
+    % update running variables
+    x = x_new;
+    fval = fval_new;
+    g = g_new;
+    H = H_new;
+    Q = Q_new;
+    D = D_new;
+    gnorm = norm(g,2);
+    delta = delta_new;
+    
+    b = Q'*g;  
 end
 
-% meta information
-if gnorm >= tol
-    % did not converge
+% fill up meta information
+if gnorm >= tol % no convergence
     meta.exitflag = 0;
-else
+else % approximate first-order stationarity condition satisfied
     meta.exitflag = 1;
 end
 meta.algorithm = 'scmtr_src';
 meta.g = g;
 meta.H = H;
 
-end
+end % function
 
 
 %% Helper functions
@@ -152,6 +154,7 @@ end
 
 function z = minPoly(c0,c1,c2,c3,c4,DeltaNeg,DeltaPos)
 % compute the minimum of the function h in [DeltaNeg,DeltaPos]
+
 h = @(z) c0 + c1*z + c2*z^2 + c3*z^3 + c4*abs(z)^3;
 zs = [DeltaNeg,DeltaPos];
 if c2 == 0 && c3 == 0 && c4 == 0
@@ -188,6 +191,7 @@ end
 
 function z = argmin(zs,fun)
 % value z in zs such that fun(z) is minimal among all z in zs
+
 n = size(zs,2);
 z = zs(1);
 fval = fun(z);
@@ -203,7 +207,8 @@ end
 end
 
 
-function [options] = getOptions(n,options_in)
+function [options] = get_options(n,options_in)
+% fill non-existent fields with default values, and check validity
 
 options = struct();
 
@@ -229,7 +234,7 @@ options.verbosity   = 1;
 cell_fieldnames = fieldnames(options);
 cell_fieldnames_in = fieldnames(options_in);
 
-for jf=1:length(cell_fieldnames_in)
+for jf = 1:length(cell_fieldnames_in)
     fieldname = cell_fieldnames_in{jf};
     if ~any(strcmp(cell_fieldnames,fieldname))
         error(['Options field ' fieldname ' does not exist.']);

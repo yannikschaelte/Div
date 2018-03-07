@@ -1,7 +1,8 @@
 function [x,fval,meta] = scmcr_src(fun,x0,options)
-% A regularized separable cubic trust-region method, based on
-% [Cubic-regularization counterpart of a variable-norm trust-region method
-% for unconstrained minimization. Martinez, Raydan. 2015]
+% Method for unconstrained optimization via a cubic-regularization approach
+% using a separable cubic model. Based on [Cubic-regularization counterpart
+% of a variable-norm trust-region method for unconstrained minimization.
+% Martínez, Raydan. 2015].
 %
 % Input:
 %   fun     : function pointer to a function [fval,g,H] = fun(x) where fval
@@ -9,168 +10,139 @@ function [x,fval,meta] = scmcr_src(fun,x0,options)
 %             matrix at x
 %   x0      : start parameters for local search
 %   options : algorithm options
-%       .tol
-%       .sigma0
-%       .sigma_small
-%       .Delta
-%       .alpha
-%       .rhomin
-%       .rhomax
-%       .rho0
-%       .sigma_factor
-%       .maxIter
-%       .maxFunEvals
-%       .barrier
+%
+% Output:
+%   x       : parameters for best found function value
+%   fval    : best found function value, fun(x)
+%   meta    : additional run information
 
 % initialize values
 x = x0(:);
 n = size(x,1);
 
-% initialize meta data indicating failure
-meta.exitflag = -1;
-fval = nan;
-meta.g = nan(n,1);
-meta.H = nan(n,n);
-meta.iterations = 0;
-meta.funEvals = 0;
-
-% unit roundoff
-epsilon = sqrt(eps);
-
-% parameters
+% paramters
 if nargin < 3, options = struct(); end
-[tol,sigma,sigma_small,sigma_factor,Delta,alpha,rhomin,rhomax,rho,maxIter,maxFunEvals,lb,ub,barrier] = getOptions(n,options);
+options = get_options(n,options);
+meta.options = options;
 
-% check feasibility of starting point
-if any(x<lb) || any(x>ub)
-    return;
-end
-
-% function value and derivatives at start point
+% function value and derivatives at starting point
 [fval,g,H] = fun(x);
-jIter = 1;
-jFunEvals = 1;
-
-% check if function differentiable at start point
+% initialize meta
+meta.g = g;
+meta.H = H;
+meta.iter = 0;
+meta.funEvals = 1;
+% check if function differentiable at starting point
 if ~isfinite(fval) || ~all(isfinite(g)) || ~all(all(isfinite(H)))
+    meta.exitflag = -1;
     return;
 end
+
+% initialize further starting point variables
 
 % [Q,T] = schur(A) where A = Q*T*Q', Q unitary, T (Schur form)
 % upper triangular. Can be computed e.g. via QR. For symmetric matrices,
 % this is the spectral decomposition with T = D diagonal.
-[Q,D] = schur(H);
-b = Q'*g;
-gnorm = norm(g,2);
-snorm = inf;
-absfvaldiff = inf;
-
-% reserve space for solution of rotated problem
-y = zeros(n,1);
-
-% wrap function with barrier
-bounded_fun = @(x,jIter) bound_fun(x,fun,lb,ub,barrier,jIter,maxIter);
+[Q,D]       = schur(H);
+b           = Q'*g;
+gnorm       = norm(g,2);
+sigma       = options.sigma0;
+rho         = options.rho0;
+roundoff    = sqrt(eps); % unit roundoff
+y           = zeros(n,1); % space for solution of rotated problem
 
 % main loop
-% TODO also add conditions for steplength and minimum (negative) eigenvalue
-while gnorm > tol && snorm > tol && absfvaldiff > tol && jIter < maxIter && jFunEvals < maxFunEvals
-    jIter = jIter + 1;
+while gnorm > options.tol ...
+        && meta.iter < options.maxIter ...
+        && meta.funEvals < options.maxFunEvals
     
-    % solve trust-region subproblem
+    % increment iteration counter
+    meta.iter = meta.iter + 1;
+    
+    % output
+    if options.verbosity ~= 0
+        if mod(meta.iter,10) == 1
+            fprintf('it.\tev.\tfval\n');
+        end
+        fprintf('%d\t%d\t%.6e\n',meta.iter,meta.funEvals,fval);
+    end
+    
+    % solve cubic-regularization subproblem
     for j=1:n
         c0=0;c1=b(j);c2=D(j,j)/2;c3=rho(j)/6;c4=sigma/6;
-        y(j) = minPoly(c0,c1,c2,c3,c4,-Delta,Delta);
+        y(j) = minPoly(c0,c1,c2,c3,c4,-options.Delta,options.Delta);
     end
     
-    % try step
+    % compute step
     s = Q*y;
     x_new = x + s;
-    fval_new = bounded_fun(x_new,jIter);
-    snorm = norm(s,2);
+    fval_new = fun(x_new);
     
-    fval_diff = fval_new - fval; % desired: improvement < 0
-    predicted_fval_diff = g(:)'*s + 0.5*s'*H*s;
+    % evaluate step
     
-    predictionRatio = fval_diff / predicted_fval_diff;
-%     disp(num2str(predictionRatio));
-    if predictionRatio > 0.9
-        Delta = min([Delta*1.1,4]);
-    elseif predictionRatio < 0.25
-        Delta = max([Delta*0.9,1]);
+    if ~isfinite(fval_new) ...
+            || fval_new > fval - options.alpha * sum(abs(y).^3)
+        % no sufficient decrease: increase sigma
+        sigma = max([options.sigma_small,options.eta*sigma]);
+        continue;
     end
     
-    if ~isfinite(fval_new) || fval_diff > - alpha * sum(abs(y).^3)
-        % no success: increase sigma
-        sigma = max([sigma_small,sigma_factor*sigma]);
-        % if somehow better, adapt
-        if fval_new >= fval
-            continue;
-        end
-    else
-        sigma = sigma/10;
-        absfvaldiff = abs(fval_diff);
-    end
-    
-    % also compute derivatives
+    % move to better x, so also compute derivatives
     [fval_new,g_new,H_new] = fun(x_new);
-    jFunEvals = jFunEvals + 1; % funEvals means with derivatives
+    meta.funEvals = meta.funEvals + 1;
     
     % check validity
     if ~isfinite(fval_new) || ~all(isfinite(g_new)) || ~all(all(isfinite(H_new)))
-        sigma = max([sigma_small,sigma_factor*sigma]);
-    else
-        % update values
-        [Q_new,D_new] = schur(H_new);
+        % treat like failed step
+        sigma = max([options.sigma_small,options.eta*sigma]);
+        continue;
+    end
+    
+    % update values
+    [Q_new,D_new] = schur(H_new);
         
-        % update rho inspired by a third-order secant equation
-        denominator = Q_new'*s;
-        for j=1:n
-            dj = denominator(j);
-            if -epsilon < dj && dj <= 0
-                denominator(j) = -epsilon;
-            elseif 0 < dj && dj < epsilon
-                denominator(j) = epsilon;
-            end
+    % update rho inspired by a third-order secant equation
+    den = Q_new'*s;
+    for j=1:n
+        den_j = den(j);
+        if -roundoff < den_j && den_j <= 0
+            den(j) = -roundoff;
+        elseif 0 < den_j && den_j < roundoff
+            den(j) = roundoff;
         end
-        rho = diag((D_new-Q_new'*H*Q_new))./denominator;
-        
-        % keep rho within bounds
-        rho = min(max(rho,rhomin),rhomax);
-        
-        % update running variables
-        x = x_new;
-        fval = fval_new;
-        g = g_new;
-        H = H_new;
-        Q = Q_new;
-        D = D_new;
-        gnorm = norm(g,2);
-        
-        b = Q'*g;
     end
-    if mod(jIter,20) == 0
-        fprintf('Iter.\tfval\tDelta\tsnorm\tpredictionRatio--------\n');
-    end
-    fprintf('%d\t%.15f\t%.15f\t%.15f\t%.15f\n',jIter,fval,Delta,snorm,predictionRatio);
+    rho = diag((D_new-Q_new'*H*Q_new))./den;
+        
+    % keep rho within bounds
+    rho = min(max(rho,options.rho_min),options.rho_max);
+        
+    % update running variables
+    x = x_new;
+    fval = fval_new;
+    g = g_new;
+    H = H_new;
+    Q = Q_new;
+    D = D_new;
+    gnorm = norm(g,2);
+        
+    b = Q'*g;
 end
 
-
-% meta information
-if gnorm >= tol
-    % did not converge
+% fill up meta information
+if gnorm >= tol % no convergenc
     meta.exitflag = 0;
 else
     meta.exitflag = 1;
 end
-meta.algorithm = 'rsc';
-meta.iterations = jIter;
-meta.funEvals = jFunEvals;
+meta.algorithm = 'scmcr_src';
 meta.g = g;
 meta.H = H;
 
-end
+end % function
+
 
 %% Helper functions
+
 
 function z = minPoly(c0,c1,c2,c3,c4,DeltaNeg,DeltaPos)
 % compute the minimum of the function h in [DeltaNeg,DeltaPos]
@@ -204,7 +176,9 @@ elseif c4 ~= 0
     zpos = minPoly(c0,c1,c2,c3+c4,0,0,DeltaPos);
     z = argmin([zneg,zpos],h);
 end
+
 end
+
 
 function z = argmin(zs,fun)
 % value z in zs such that fun(z) is minimal among all z in zs
@@ -219,83 +193,41 @@ for j=2:n
         fval = fval_new;
     end
 end
-end
-
-function [tol,sigma,sigma_small,sigma_factor,Delta,alpha,rhomin,rhomax,rho,maxIter,maxFunEvals,lb,ub,barrier] = getOptions(n,options)
-
-% default values
-tol = 1e-8;
-sigma = 0; % start with second order problem
-sigma_small = 0.1;
-sigma_factor = 2;
-Delta = 2;
-alpha = 1*1e-4;
-rhomax = 1e3*ones(n,1);
-rhomin = -rhomax;
-rho = 1*ones(n,1);
-maxIter = 1000;
-maxFunEvals = 1000;
-lb = -Inf*ones(n,1);
-ub = Inf*ones(n,1);
-barrier = '';
-
-% extract from input
-if isfield(options,'Tol')
-    tol = options.Tol;
-end
-if isfield(options,'Sigma0')
-    sigma = options.Sigma0;
-end
-if isfield(options,'Sigma_small')
-    sigma_small = options.Sigma_small;
-end
-if isfield(options,'Sigma_factor')
-    sigma_factor = options.Sigma_factor;
-end
-if isfield(options,'Delta')
-    Delta = options.Delta;
-end
-if isfield(options,'Alpha')
-    alpha = options.Alpha;
-end
-if isfield(options,'Rhomax')
-    rhomax = options.Rhomax;
-end
-if isfield(options,'Rhomin')
-    rhomin = options.Rhomin;
-end
-if isfield(options,'Rho0')
-    rho = options.Rho0;
-end
-if isfield(options,'MaxIter')
-    maxIter = options.MaxIter;
-end
-if isfield(options,'MaxFunEvals')
-    maxFunEvals = options.MaxFunEvals;
-end
-if isfield(options,'Lb')
-    lb = options.Lb;
-end
-if isfield(options,'Ub')
-    ub = options.Ub;
-end
-if isfield(options,'Barrier')
-    barrier = options.Barrier;
-end
 
 end
 
-function fval = bound_fun(x,fun,lb,ub,barrier,jIter,maxIter)
-if ~isequal(barrier,'')
-    fval = fun(x);
-    fval = barrierFunction(fval, [], x, [lb, ub], jIter, maxIter, barrier);
-else
-    % extreme barrier
-    % set fun to inf whenever conditions not fulfilled
-    if any(x>ub) || any(x<lb)
-        fval = inf;
-    else
-        fval = fun(x);
+
+function [options] = get_options(n,options_in)
+% fill options with default values, and check validity
+
+options = struct();
+
+% default options
+options.rho0        = 1*ones(n,1);
+options.rho_max     = 1e3;
+options.rho_min     = -options.rho_max;
+options.Delta       = 2;
+options.alpha       = 1e-4;
+options.eta         = 10;
+options.sigma0      = 2;
+options.sigma_small = 0.1;
+options.tol         = 1e-8;
+
+% additional options
+options.maxIter     = Inf;
+options.maxFunEvals = Inf;
+options.verbosity   = 1;
+
+% fill from input
+cell_fieldnames = fieldnames(options);
+cell_fieldnames_in = fieldnames(options_in);
+
+for jf = 1:length(cell_fieldnames_in)
+    fieldname = cell_fieldnames_in{jf};
+    if ~any(strcmp(cell_fieldnames,fieldname))
+        error(['Options field ' fieldname ' does not exist.']);
     end
+    options.(fieldname) = options_in.(fieldname);
 end
+
 end
