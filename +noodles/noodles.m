@@ -1,15 +1,14 @@
-function results = noodles(fun, x0, options)
+function results = noodles(objfun, init_x, options)
 
 % handle options
 if nargin < 3
     options = struct();
 end
-options = NoodleOptions(options);
 
 % initialize problem
-problem = NoodleProblem();
+problem = noodles.NoodleProblem(objfun, init_x, options);
 
 % run optimization
-results = problem.run_optimization(options);
+results = problem.run_optimization();
 
 end

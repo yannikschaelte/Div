@@ -18,7 +18,7 @@ classdef NoodleResults < handle
         
         function results = NoodleResults(problem)
             % Constructor
-            if isa(problem,'NoodleProblem')
+            if isa(problem,'noodles.NoodleProblem')
                 results.init_x          = problem.init_x;
                 results.init_fval       = problem.init_fval;
                 results.final_x         = problem.state.x;

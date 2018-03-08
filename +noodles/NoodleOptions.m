@@ -1,24 +1,21 @@
 classdef NoodleOptions < handle
     
     properties
-        % optimizer options
-        subproblem = SubproblemTR();
+        subproblem = noodles.SubproblemScmtr();
         
-        % optimization options
-        tol_step = 1e-10;
-        tol_grad = 1e-5;
-        iter_max = Inf;
+        tol_step    = 1e-10;
+        tol_grad    = 1e-6;
+        iter_max    = Inf;
         funeval_max = Inf;
         hessian_fcn = 'objective';
         verbosity   = 1;
-        
         
     end
     
     methods
         
         function options = NoodleOptions(options_in)
-            if isa(options_in,'NoodleOptions')
+            if isa(options_in,'noodles.NoodleOptions')
                 options = options_in;
             elseif isa(options_in,'struct')
                 fields_in = fields(options_in);

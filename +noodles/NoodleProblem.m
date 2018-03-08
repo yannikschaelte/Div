@@ -1,26 +1,25 @@
 classdef NoodleProblem < handle
     
     properties
-        options;
         objfun;
         init_x;
-        init_fval;
         dim;
-        start_time;
-        lb;
-        ub;
-        
-        state;
+        options;
         subproblem;
         
-        exitflag;
+        start_time;
+        state;
         
+        exitflag;      
     end
     
     methods
-        function this = NoodleProblem(subproblem,options)
-            this.subproblem = subproblem;
-            this.options = options;
+        function this = NoodleProblem(objfun, init_x, options)
+            this.objfun     = objfun;
+            this.init_x     = init_x(:);
+            this.dim        = size(this.init_x,1);
+            this.options    = noodles.NoodleOptions(options);
+            this.subproblem = this.options.subproblem; % duplicate
         end
         
         function results = run_optimization(this)
@@ -34,7 +33,7 @@ classdef NoodleProblem < handle
             while this.cont()              
                 
                 % update subproblem location
-                this.subproblem.update_location(this.state);
+                this.subproblem.update(this.state);
                               
                 accept_step = false;
                 while ~accept_step && this.cont()
@@ -43,11 +42,14 @@ classdef NoodleProblem < handle
                     this.subproblem.solve();
                     
                     % check proposed step
-                    accept_step = this.subproblem.check_proposed_step(@this.compute_fval);
+                    accept_step = this.subproblem.evaluate(@this.compute_fval);
                     
+                    % update state if demanded and possible
                     if accept_step
                         accept_step = this.update_state(this.subproblem.proposed_x);
                     end
+                    
+                    % adapt subproblem according to whether step accepted
                     this.subproblem.handle_accept_step(accept_step);      
                     
                     % check termination criteria
@@ -62,7 +64,8 @@ classdef NoodleProblem < handle
                 
         function init(this)
            this.exitflag = nan;
-           if ~this.update_state(x)
+           this.state = noodles.NoodleState(this.dim);
+           if ~this.update_state(this.init_x)
                this.exitflag = -2;
            end
         end
@@ -88,6 +91,8 @@ classdef NoodleProblem < handle
         end
         
         function check_termination(this)
+            this.state.iter_count = this.state.iter_count + 1;
+            
             if this.state.gradnorm < this.options.tol_grad
                 this.exitflag = 1;
             elseif this.state.iter_count > this.options.iter_max ...

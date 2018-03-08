@@ -1,7 +1,7 @@
-classdef SubproblemTr
-
+classdef SubproblemScmcr
+    
     properties
-
+        
     end
     
     methods
