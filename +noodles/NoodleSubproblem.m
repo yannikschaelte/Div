@@ -1,6 +1,7 @@
 classdef (Abstract) NoodleSubproblem < handle
     
     properties
+        options;
         dim;
         lb;
         ub;
@@ -8,14 +9,20 @@ classdef (Abstract) NoodleSubproblem < handle
         cur_x;
         cur_grad;
         cur_hess;
+        step;
+        proposed_x;
         
         meta;
     end
     
     methods
         
-        function this = NoodleSubproblem()
+        function this = NoodleSubproblem(options)
             % Constructor
+            if nargin < 1
+                options = struct();
+            end
+            this.options = get_options(options);
         end
         
         function init(this,noodle_problem)
@@ -26,9 +33,29 @@ classdef (Abstract) NoodleSubproblem < handle
             else
                 error('Invalid input for NoodleOptions.init.');
             end
+            
+            this.cur_x = [];
+            this.cur_grad = [];
+            this.curr_hess = [];
+            this.meta = struct();
+        end
+        
+        function update(this, state)
+            this.cur_x = state.x;
+            this.cur_grad = state.grad;
+            this.cur_hess = state.hess;
+        end
+                  
+        function solve(this)
+            
+        end
+        
+        function evaluate(this)
+            
         end
 
     end
+    
     methods (Static)
        
         function options = get_options()

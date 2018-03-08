@@ -1,16 +1,19 @@
-classdef SubproblemTR < NoodleSubproblem
+classdef SubproblemTR < noodles.NoodleSubproblem
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
     properties
-        Property1
+        
     end
     
     methods
-        function obj = untitled(inputArg1,inputArg2)
-            %UNTITLED Construct an instance of this class
-            %   Detailed explanation goes here
-            obj.Property1 = inputArg1 + inputArg2;
+        
+        function this = SubproblemTR(options_in)
+            if nargin < 1
+                options = struct();
+            end
+            
+            this.options = get_options(options_in);
         end
         
         function outputArg = method1(obj,inputArg)
@@ -23,7 +26,7 @@ classdef SubproblemTR < NoodleSubproblem
     methods (Static)
         
         function options = get_options(options_in)
-            options = get_options@NoodleOptions();
+            
             
         end
         
