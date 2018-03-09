@@ -1,7 +1,10 @@
 classdef NoodleOptions < handle
     
     properties
-        subproblem = noodles.SubproblemScmcr();
+        subproblem = noodles.SubproblemScmtr();
+        
+        lb  = -inf;
+        ub  = inf;
         
         tol_grad        = 1e-6;
         tol_step        = 1e-6;

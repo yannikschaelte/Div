@@ -2,7 +2,7 @@ classdef NoodleProblem < handle
     
     properties
         objfun;
-        init_x;
+        x0;
         dim;
         options;
         subproblem;
@@ -14,10 +14,10 @@ classdef NoodleProblem < handle
     end
     
     methods
-        function this = NoodleProblem(objfun, init_x, options)
+        function this = NoodleProblem(objfun, x0, options)
             this.objfun     = objfun;
-            this.init_x     = init_x(:);
-            this.dim        = size(this.init_x,1);
+            this.x0         = x0(:);
+            this.dim        = size(this.x0,1);
             this.options    = noodles.NoodleOptions(options);
             this.subproblem = this.options.subproblem; % duplicate
         end
@@ -69,9 +69,16 @@ classdef NoodleProblem < handle
         end
         
         function init(this)
+            this.start_time = cputime;
             this.exitflag = nan;
             this.state = noodles.NoodleState(this.dim);
-            if ~this.update_state(this.init_x)
+            if length(this.options.lb) == 1
+                this.options.lb = this.options.lb * ones(this.dim, 1);
+            end
+            if length(this.options.ub) == 1
+                this.options.ub = this.options.ub * ones(this.dim, 1);
+            end
+            if ~this.update_state(this.x0)
                 this.exitflag = -2;
             end
         end

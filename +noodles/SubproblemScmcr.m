@@ -3,13 +3,13 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
     %   Detailed explanation goes here
     
     properties
-        Q
-        D
-        b
-        delta
-        rho
-        sigma
-        y % space for solution of rotated problem
+        Q;
+        D;
+        b;
+        delta;
+        rho;
+        sigma;
+        y; % space for solution of rotated problem
               
         sufficient_decrease;
         flag_initial;
@@ -32,7 +32,11 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
             this.b      = nan(this.dim,1);
             this.delta  = this.options.delta0;
             this.sigma  = this.options.sigma0;
-            this.rho    = this.options.rho0 * ones(this.dim, 1);
+            if length(this.options.rho0) == 1
+                this.rho    = this.options.rho0 * ones(this.dim, 1);
+            else
+                this.rho    = this.options.rho0(:);
+            end
             this.y      = nan(this.dim,1);
             this.flag_initial = true;
         end

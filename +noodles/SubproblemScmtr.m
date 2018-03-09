@@ -3,14 +3,14 @@ classdef SubproblemScmtr < noodles.NoodleSubproblem
     %   Detailed explanation goes here
     
     properties
-        Q
-        D
-        b
-        delta
-        rho
-        y % space for solution of rotated problem
+        Q;
+        D;
+        b;
+        delta;
+        rho;
+        y; % space for solution of rotated problem
         
-        ratio
+        ratio;
         flag_initial;
     end
     
