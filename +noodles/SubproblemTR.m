@@ -1,4 +1,4 @@
-classdef SubproblemTr < noodles.NoodlesSubproblem
+classdef SubproblemTr < noodles.NoodleSubproblem
 
     properties
         tr_radius;
@@ -33,7 +33,7 @@ classdef SubproblemTr < noodles.NoodlesSubproblem
             pred_diff = this.fval - q;
             this.ratio = fval_diff / pred_diff;
             
-            accept_step = fval_new < fval;
+            accept_step = fval_new < this.fval;
         end
         
         function handle_accept_step(this, accept_step)

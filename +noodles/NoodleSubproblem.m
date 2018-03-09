@@ -50,7 +50,7 @@ classdef (Abstract) NoodleSubproblem < handle
         
         % evaluate objfun(x+s) and return whether this step should be
         % accepted
-        accept_step = evaluate(this, objfun)
+        accept_step = evaluate(this, fval_new)
         
         % update internal state according to whether the last step can be
         % accepted or not

@@ -31,6 +31,9 @@ classdef NoodleProblem < handle
             this.subproblem.init(this);
             
             while this.cont()
+                                                
+                % output
+                this.print();
                 
                 % update subproblem location
                 this.subproblem.update(this.state);
@@ -59,10 +62,10 @@ classdef NoodleProblem < handle
                     this.check_termination();
                 end
                 
-                % output
-                this.print_output();
-                
             end
+            
+            % print final output
+            this.print_final();
             
             results = noodles.NoodleResults(this);
             
@@ -126,11 +129,19 @@ classdef NoodleProblem < handle
             bool_cont = isnan(this.exitflag);
         end
         
-        function print_output(this)
+        function print(this)
             if this.options.verbosity ~= 0
-                if mod(this.state.iter_count,10) == 1
+                if mod(this.state.iter_count,10) == 0
                     fprintf('iter\tfeval\tfval\n');
                 end
+                fprintf('%d\t%d\t%.6e\n', this.state.iter_count,this.state.feval_count,this.state.fval);
+            end
+        end
+        
+        function print_final(this)
+            if this.options.verbosity ~= 0
+                fprintf('final value found:\n');
+                fprintf('iter\tfeval\tfval\n');
                 fprintf('%d\t%d\t%.6e\n', this.state.iter_count,this.state.feval_count,this.state.fval);
             end
         end
