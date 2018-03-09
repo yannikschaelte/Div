@@ -6,8 +6,9 @@ classdef NoodleState < handle
         grad;
         hess;
         gradnorm;
+        fvaldiff;
         iter_count;
-        funeval_count;
+        feval_count;
     end
     
     methods
@@ -17,8 +18,9 @@ classdef NoodleState < handle
             this.grad = nan(dim,1);
             this.hess = nan(dim,dim);
             this.gradnorm = nan;
+            this.fvaldiff = inf;
             this.iter_count = 0;
-            this.funeval_count = 0;
+            this.feval_count = 0;
         end
 
     end

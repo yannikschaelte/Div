@@ -3,12 +3,13 @@ classdef NoodleOptions < handle
     properties
         subproblem = noodles.SubproblemScmtr();
         
-        tol_step    = 1e-10;
-        tol_grad    = 1e-6;
-        iter_max    = Inf;
-        funeval_max = Inf;
-        hessian_fcn = 'objective';
-        verbosity   = 1;
+        tol_grad        = 1e-6;
+        tol_step        = 1e-6;
+        tol_fvaldiff    = 1e-6;
+        iter_max        = Inf;
+        feval_max     = Inf;
+        hessian_fcn     = 'objective';
+        verbosity       = 1;
         
     end
     

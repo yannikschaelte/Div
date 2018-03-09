@@ -5,7 +5,8 @@ rng(0);
 exdir=fileparts(which('test_jakstat.m'));
 addpath('..');
 addpath('../testmodels/jakstat');
-addpath('../../Noodles');
+% addpath('../../Noodles');
+addpath('..');
 load('data_jakstat','D');
 fun = @(x) nllh_jakstat(x,D);
 parameters = get_parameters_jakstat();
@@ -16,7 +17,7 @@ tolFun  = 1e-10;
 tolX    = 1e-12;
 maxFunEvals = 200;
 maxIter     = Inf;
-x0 = 0*ones(parameters.number,1);
+x0 = 1*ones(parameters.number,1);
 
 used_time = cputime;
 
@@ -53,6 +54,8 @@ switch optimizer
         options = struct();
         options.maxFunEvals = maxFunEvals;
         [x,fval,meta] = yopt.hoo.scmcr_src(fun,x0,options);
+    case 'noodles'
+        result = noodles.noodles(fun,x0);
     case 'Noodles'
         options = struct();
         options.tolGrad = tolX;

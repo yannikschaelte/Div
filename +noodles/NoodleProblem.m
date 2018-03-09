@@ -10,7 +10,7 @@ classdef NoodleProblem < handle
         start_time;
         state;
         
-        exitflag;      
+        exitflag;
     end
     
     methods
@@ -30,48 +30,54 @@ classdef NoodleProblem < handle
             % initialize the subproblem
             this.subproblem.init(this);
             
-            while this.cont()              
+            while this.cont()
                 
                 % update subproblem location
                 this.subproblem.update(this.state);
-                              
+                
                 accept_step = false;
                 while ~accept_step && this.cont()
                     
-                    % solve subproblem
+                    % solve subproblem to compute step s
                     this.subproblem.solve();
                     
-                    % check proposed step
-                    accept_step = this.subproblem.evaluate(@this.compute_fval);
+                    % evaluate value at proposed step
+                    fval_new = this.compute_fval(this.state.x + this.subproblem.step);
+                    
+                    % check step
+                    accept_step = this.subproblem.evaluate(fval_new);
                     
                     % update state if demanded and possible
                     if accept_step
-                        accept_step = this.update_state(this.subproblem.proposed_x);
+                        accept_step = this.update_state(this.state.x + this.subproblem.step);
                     end
                     
                     % adapt subproblem according to whether step accepted
-                    this.subproblem.handle_accept_step(accept_step);      
+                    this.subproblem.handle_accept_step(accept_step);
                     
                     % check termination criteria
                     this.check_termination();
                 end
                 
+                % output
+                this.print_output();
+                
             end
             
-            results = NoodleResults(this);
-                
-        end
-                
-        function init(this)
-           this.exitflag = nan;
-           this.state = noodles.NoodleState(this.dim);
-           if ~this.update_state(this.init_x)
-               this.exitflag = -2;
-           end
+            results = noodles.NoodleResults(this);
+            
         end
         
-        function fval = compute_fval(x)
-            fval = this.objfun(x);          
+        function init(this)
+            this.exitflag = nan;
+            this.state = noodles.NoodleState(this.dim);
+            if ~this.update_state(this.init_x)
+                this.exitflag = -2;
+            end
+        end
+        
+        function fval = compute_fval(this, x)
+            fval = this.objfun(x);
             % this.state.feval_count = this.state.feval_count + 1;
         end
         
@@ -80,12 +86,16 @@ classdef NoodleProblem < handle
             this.state.feval_count = this.state.feval_count + 1;
             
             if ~isfinite(fval) || ~all(isfinite(grad)) || ~all(all(isfinite(hess)))
-                success = false;       
+                success = false;
             else
+                fval_old = this.state.fval;
+                
                 this.state.x    = x;
                 this.state.fval = fval;
                 this.state.grad = grad;
                 this.state.hess = hess;
+                this.state.gradnorm = norm(grad, 2);
+                this.state.fvaldiff = fval_old - fval;
                 success = true;
             end
         end
@@ -95,14 +105,27 @@ classdef NoodleProblem < handle
             
             if this.state.gradnorm < this.options.tol_grad
                 this.exitflag = 1;
+            elseif this.subproblem.stepnorm < this.options.tol_step
+                this.exitflag = 2;
+            elseif abs(this.state.fvaldiff) < this.options.tol_fvaldiff
+                this.exitflag = 3;
             elseif this.state.iter_count > this.options.iter_max ...
                     || this.state.feval_count > this.options.feval_max
-                this.exitflag = -1;
+                this.exitflag = 0;
             end
         end
         
         function bool_cont = cont(this)
             bool_cont = isnan(this.exitflag);
+        end
+        
+        function print_output(this)
+            if this.options.verbosity ~= 0
+                if mod(this.state.iter_count,10) == 1
+                    fprintf('iter\tfeval\tfval\n');
+                end
+                fprintf('%d\t%d\t%.6e\n', this.state.iter_count,this.state.feval_count,this.state.fval);
+            end
         end
     end
 end

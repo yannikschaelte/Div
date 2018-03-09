@@ -5,44 +5,33 @@ classdef (Abstract) NoodleSubproblem < handle
         
         dim;
         
-        x;
+        fval;
         grad;
         hess;
-        s;
         
-        meta;
+        step;
+        stepnorm;
     end
     
     methods
         
-        function this = NoodleSubproblem(options)
-            % Constructor
-            if nargin < 1
-                options = struct();
-            end
-            this.options = noodles.NoodleSubproblem.get_options(options);
+        function this = NoodleSubproblem()
+            % Constructor, is called implicitly
         end
         
-        function init(this, noodle_problem)
-            if isa(noodle_problem,'NoodleProblem')
-                this.dim = noodle_problem.dim;
-            else
-                error('Invalid input for NoodleOptions.init.');
-            end
-            
-            this.x    = nan(this.dim,1);
-            this.grad = nan(this.dim,1);
-            this.hess = nan(this.dim,this.dim);
-            this.s    = nan(this.dim,1);
-            
-            this.meta = struct();
+        function init(this, noodle_problem)    
+            this.dim        = noodle_problem.dim;
+            this.fval       = nan;
+            this.grad       = nan(this.dim,1);
+            this.hess       = nan(this.dim,this.dim);
+            this.step       = nan(this.dim,1);
+            this.stepnorm   = inf;
         end
         
         function update(this, state)
-            this.x    = state.x;
+            this.fval = state.fval;
             this.grad = state.grad;
             this.hess = state.hess;
-            this.s    = nan(this.dim,1);
         end
         
     end
@@ -63,23 +52,9 @@ classdef (Abstract) NoodleSubproblem < handle
         
     end
     
-    methods (Static)
+    methods (Static, Abstract)
         
-        function options = get_options(options_in)
-            options = struct();
-            
-            % fill from input
-            cell_fieldnames = fieldnames(options);
-            cell_fieldnames_in = fieldnames(options_in);
-            
-            for jf = 1:length(cell_fieldnames_in)
-                fieldname = cell_fieldnames_in{jf};
-                if ~any(strcmp(cell_fieldnames,fieldname))
-                    error(['Options field ' fieldname ' does not exist.']);
-                end
-                options.(fieldname) = options_in.(fieldname);
-            end
-        end
+        options = get_options(options_in)
         
     end
 end
