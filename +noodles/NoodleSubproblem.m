@@ -7,6 +7,7 @@ classdef (Abstract) NoodleSubproblem < handle
         lb;
         ub;
         
+        x;
         fval;
         grad;
         hess;
@@ -33,6 +34,7 @@ classdef (Abstract) NoodleSubproblem < handle
         end
         
         function update(this, state)
+            this.x    = state.x;
             this.fval = state.fval;
             this.grad = state.grad;
             this.hess = state.hess;
