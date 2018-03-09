@@ -1,16 +1,21 @@
 classdef NoodleOptions < handle
     
     properties
-        subproblem = noodles.SubproblemScmtr();
+        subproblem = noodles.SubproblemScmcr();
         
         tol_grad        = 1e-6;
         tol_step        = 1e-6;
         tol_fvaldiff    = 1e-6;
         iter_max        = Inf;
-        feval_max     = Inf;
-        hessian_fcn     = 'objective';
+        feval_max       = Inf;   
+        hessian_fcn     = noodles.NoodleOptions.objective;
         verbosity       = 1;
         
+    end
+    
+    properties (Constant)
+        objective   = 'objective';
+        sr1         = 'sr1';
     end
     
     methods

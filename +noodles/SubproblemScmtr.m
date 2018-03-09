@@ -143,7 +143,7 @@ classdef SubproblemScmtr < noodles.NoodleSubproblem
             
         end
         
-        function z = min_poly(c0,c1,c2,c3,c4,DeltaNeg,DeltaPos)
+        function z = min_poly(c0, c1, c2, c3, c4, DeltaNeg, DeltaPos)
             % compute the minimum of the function h in [DeltaNeg,DeltaPos]
             
             h = @(z) c0 + c1*z + c2*z^2 + c3*z^3 + c4*abs(z)^3;
@@ -173,14 +173,14 @@ classdef SubproblemScmtr < noodles.NoodleSubproblem
                     z = argmin(zs,h);
                 end
             elseif c4 ~= 0
-                zneg = minPoly(c0,c1,c2,c3-c4,0,DeltaNeg,0);
-                zpos = minPoly(c0,c1,c2,c3+c4,0,0,DeltaPos);
+                zneg = noodles.SubproblemScmtr.min_poly(c0,c1,c2,c3-c4,0,DeltaNeg,0);
+                zpos = noodles.SubproblemScmtr.min_poly(c0,c1,c2,c3+c4,0,0,DeltaPos);
                 z = argmin([zneg,zpos],h);
             end
             
         end
         
-        function z = argmin(zs,fun)
+        function z = argmin(zs, fun)
             % value z in zs such that fun(z) is minimal among all z in zs
             
             n = size(zs,2);

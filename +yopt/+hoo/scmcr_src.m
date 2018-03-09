@@ -209,7 +209,7 @@ options.rho_min     = -options.rho_max;
 options.Delta       = 2;
 options.alpha       = 1e-4;
 options.eta         = 10;
-options.sigma0      = 2;
+options.sigma0      = 0;
 options.sigma_small = 0.1;
 options.tol         = 1e-8;
 
