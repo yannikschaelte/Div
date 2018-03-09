@@ -4,6 +4,8 @@ classdef (Abstract) NoodleSubproblem < handle
         options;
         
         dim;
+        lb;
+        ub;
         
         fval;
         grad;
@@ -21,6 +23,8 @@ classdef (Abstract) NoodleSubproblem < handle
         
         function init(this, noodle_problem)    
             this.dim        = noodle_problem.dim;
+            this.lb         = noodle_problem.options.lb;
+            this.ub         = noodle_problem.options.ub;
             this.fval       = nan;
             this.grad       = nan(this.dim,1);
             this.hess       = nan(this.dim,this.dim);
