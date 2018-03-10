@@ -159,6 +159,7 @@ classdef NoodleProblem < handle
         end
         
         function [fval, grad, hess] = sr1(problem, x)
+            % Update hessian via Symmetric Rank 1 update.
             [fval,grad] = problem.objfun(x);
             
             if problem.flag_initial
@@ -179,7 +180,29 @@ classdef NoodleProblem < handle
             end
         end
         
+        function [fval, grad, hess] = dfp(problem, x)
+            % Update hessian via Davidon-Fletcher-Powell formula.
+            [fval,grad] = problem.objfun(x);
+            
+            if problem.flag_initial
+                hess = eye(problem.dim);
+            else
+                grad_prev = problem.state.grad;
+                hess_prev = problem.state.hess;
+                step      = problem.subproblem.step;
+                
+                y = grad - grad_prev;
+                gamma = 1 / (y' * step);
+                
+                hess = (eye(problem.dim) - gamma * y * step') ...
+                    * hess_prev ...
+                    * (eye(problem.dim) - gamma * step * y') ...
+                    + gamma * (y * y');
+            end
+        end
+        
         function [fval, grad, hess] = bfgs(problem, x)
+            % Update hessian via Broyden-Fletcher-Goldfarb-Shanno formula.
             [fval,grad] = problem.objfun(x);
             
             if problem.flag_initial

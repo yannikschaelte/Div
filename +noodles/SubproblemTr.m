@@ -39,6 +39,7 @@ classdef SubproblemTr < noodles.NoodleSubproblem
         function handle_accept_step(this, accept_step)
             if ~accept_step
                 this.tr_radius = this.options.gamma_1 * this.tr_radius;
+                this.tr_radius = min([0.9*norm(this.step,2),this.tr_radius]);
             else
                 if this.ratio >= this.options.eta_2
                     this.tr_radius = min([this.options.gamma_2 * this.tr_radius, 2*sqrt(this.dim)]);

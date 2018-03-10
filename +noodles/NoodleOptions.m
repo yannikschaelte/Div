@@ -13,8 +13,8 @@ classdef NoodleOptions < handle
         feval_max       = Inf;
         % [fval, grad, hess] = derivative_fcn(problem, x)
         % use problem.objfun to compute values
-        % implemented: objective (use third output), sr1, bfgs
-        derivative_fcn  = @noodles.NoodleProblem.objective;
+        % implemented: objective (use third output), sr1, dfp, bfgs
+        derivative_fcn  = @noodles.NoodleProblem.sr1;
         verbosity       = 1;
         
     end
