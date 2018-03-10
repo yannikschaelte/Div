@@ -10,16 +10,13 @@ classdef NoodleOptions < handle
         tol_step        = 1e-6;
         tol_fvaldiff    = 1e-6;
         iter_max        = Inf;
-        feval_max       = Inf;   
-        hessian_fcn     = noodles.NoodleOptions.bfgs;
+        feval_max       = Inf;
+        % [fval, grad, hess] = derivative_fcn(problem, x)
+        % use problem.objfun to compute values
+        % implemented: objective (use third output), sr1, bfgs
+        derivative_fcn  = @noodles.NoodleProblem.objective;
         verbosity       = 1;
         
-    end
-    
-    properties (Constant)
-        objective   = 'objective';
-        sr1         = 'sr1';
-        bfgs        = 'bfgs';
     end
     
     methods
