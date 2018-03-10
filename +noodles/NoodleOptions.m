@@ -11,7 +11,7 @@ classdef NoodleOptions < handle
         tol_fvaldiff    = 1e-6;
         iter_max        = Inf;
         feval_max       = Inf;   
-        hessian_fcn     = noodles.NoodleOptions.objective;
+        hessian_fcn     = noodles.NoodleOptions.bfgs;
         verbosity       = 1;
         
     end
@@ -19,6 +19,7 @@ classdef NoodleOptions < handle
     properties (Constant)
         objective   = 'objective';
         sr1         = 'sr1';
+        bfgs        = 'bfgs';
     end
     
     methods

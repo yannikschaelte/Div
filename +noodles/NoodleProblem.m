@@ -11,6 +11,7 @@ classdef NoodleProblem < handle
         state;
         
         exitflag;
+        flag_initial;
     end
     
     methods
@@ -74,7 +75,8 @@ classdef NoodleProblem < handle
         function init(this)
             this.start_time = cputime;
             this.exitflag = nan;
-            this.state = noodles.NoodleState(this.dim);
+            this.state = noodles.NoodleState(this.dim);      
+            this.flag_initial = true;
             if length(this.options.lb) == 1
                 this.options.lb = this.options.lb * ones(this.dim, 1);
             end
@@ -83,7 +85,7 @@ classdef NoodleProblem < handle
             end
             if ~this.update_state(this.x0)
                 this.exitflag = -2;
-            end
+            end    
         end
         
         function fval = compute_fval(this, x)
@@ -98,6 +100,9 @@ classdef NoodleProblem < handle
                 case noodles.NoodleOptions.sr1
                     [fval,grad] = this.objfun(x);
                     hess = this.sr1(grad);
+                case noodles.NoodleOptions.bfgs
+                    [fval,grad] = this.objfun(x);
+                    hess = this.bfgs(grad);
             end
             this.state.feval_count = this.state.feval_count + 1;
             
@@ -113,6 +118,8 @@ classdef NoodleProblem < handle
                 this.state.gradnorm = norm(grad, 2);
                 this.state.fvaldiff = fval_old - fval;
                 success = true;
+            
+                this.flag_initial = false;
             end
         end
         
@@ -153,7 +160,9 @@ classdef NoodleProblem < handle
         end
        
         function hess = sr1(this, grad)
-            if all(all(isfinite(this.state.hess)))
+            if this.flag_initial
+                hess = eye(this.dim);
+            else
                 grad_prev = this.state.grad;
                 hess_prev = this.state.hess;
                 step      = this.subproblem.step;
@@ -166,8 +175,22 @@ classdef NoodleProblem < handle
                 else
                     hess = hess_prev;
                 end
-            else
+            end
+        end
+        
+        function hess = bfgs(this, grad)
+            if this.flag_initial
                 hess = eye(this.dim);
+            else
+                grad_prev = this.state.grad;
+                hess_prev = this.state.hess;
+                step      = this.subproblem.step;
+
+                y = grad - grad_prev;
+                s1 = (y*y') / (y'*step);
+                s2 = (hess_prev*(step*step')*hess_prev) / (step'*hess_prev*step);
+                
+                hess = hess_prev + s1 - s2;
             end
         end
         
