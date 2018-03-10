@@ -1,6 +1,8 @@
 classdef SubproblemScmtr < noodles.NoodleSubproblem
-    %UNTITLED Summary of this class goes here
-    %   Detailed explanation goes here
+    % Method for unconstrained optimization via a trust-region approach using a
+    % separable cubic model. Based on [Separable cubic modeling and a
+    % trust-region strategy for unconstrained minimization with impact in lobal
+    % optimization. Martínez, Raydan. 2015].
     
     properties ( GetAccess = 'public', SetAccess = 'private' )
         Q;
@@ -196,7 +198,7 @@ classdef SubproblemScmtr < noodles.NoodleSubproblem
             end
             
         end
-               
+        
     end
 end
 

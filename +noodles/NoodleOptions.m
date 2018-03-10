@@ -1,7 +1,7 @@
 classdef NoodleOptions < handle
     
     properties
-        subproblem = noodles.SubproblemTr();
+        subproblem = noodles.SubproblemCr();
         
         lb  = -inf;
         ub  = inf;
@@ -14,7 +14,7 @@ classdef NoodleOptions < handle
         % [fval, grad, hess] = derivative_fcn(problem, x)
         % use problem.objfun to compute values
         % implemented: objective (use third output), sr1, dfp, bfgs
-        derivative_fcn  = @noodles.NoodleProblem.sr1;
+        derivative_fcn  = @noodles.NoodleProblem.objective;
         verbosity       = 1;
         
     end

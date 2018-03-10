@@ -1,4 +1,5 @@
 classdef SubproblemTr < noodles.NoodleSubproblem
+    % Solve the subproblem by a simple trust region strategy.
 
     properties ( GetAccess = 'public', SetAccess = 'private' )
         tr_radius;
@@ -22,7 +23,8 @@ classdef SubproblemTr < noodles.NoodleSubproblem
         
         function solve(this)
             s = trust(this.grad, this.hess, this.tr_radius);
-            this.step = s;    
+            this.step = s;
+            this.stepnorm = norm(this.step, 2);
         end
         
         function accept_step = evaluate(this, fval_new)

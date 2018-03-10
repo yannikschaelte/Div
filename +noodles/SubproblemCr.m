@@ -1,135 +1,104 @@
-classdef SubproblemScmcr < noodles.NoodleSubproblem
-    % Method for unconstrained optimization via a cubic-regularization approach
-    % using a separable cubic model. Based on [Cubic-regularization counterpart
-    % of a variable-norm trust-region method for unconstrained minimization.
-    % Martínez, Raydan. 2015].
-    
+classdef SubproblemCr < noodles.NoodleSubproblem
+    % Cubic regularization
+
     properties ( GetAccess = 'public', SetAccess = 'private' )
+        sigma;
+        ratio;
+        
         Q;
         D;
         b;
-        delta;
-        rho;
-        sigma;
-        y; % space for solution of rotated problem
         
-        sufficient_decrease;
-        flag_initial;
+        y;
     end
     
     methods
         
-        function this = SubproblemScmcr(options_in)
+        function this = SubproblemCr(options_in)
             if nargin < 1
                 options_in = struct();
             end
             
-            this.options = noodles.SubproblemScmcr.get_options(options_in);
+            this.options = noodles.SubproblemCr.get_options(options_in);
         end
         
         function init(this, noodle_problem)
             init@noodles.NoodleSubproblem(this, noodle_problem);
-            this.Q      = nan(this.dim,this.dim);
-            this.D      = nan(this.dim,this.dim);
-            this.b      = nan(this.dim,1);
-            this.delta  = this.options.delta0;
-            this.sigma  = this.options.sigma0;
-            if length(this.options.rho0) == 1
-                this.rho    = this.options.rho0 * ones(this.dim, 1);
-            else
-                this.rho    = this.options.rho0(:);
-            end
-            this.y      = nan(this.dim,1);
-            this.flag_initial = true;
+            this.sigma = this.options.sigma0;
+            this.y  = nan(this.dim,1);
         end
         
         function update(this, state)
-            hess_prev = this.hess;
-            
             % update fval, grad, hess
             update@noodles.NoodleSubproblem(this, state);
             
             % update Q, D, b
             [this.Q,this.D]   = schur(this.hess);
             this.b  = this.Q'*this.grad;
-            
-            % update rho inspired by a third-order secant equation
-            if ~this.flag_initial
-                den = this.Q'*this.step;
-                for j = 1:this.dim
-                    den_j = den(j);
-                    if -this.options.roundoff < den_j && den_j <= 0
-                        den(j) = -this.options.roundoff;
-                    elseif 0 < den_j && den_j < this.options.roundoff
-                        den(j) = this.options.roundoff;
-                    end
-                end
-                this.rho = diag((this.D - this.Q'*hess_prev*this.Q))./den;
-                
-                % keep rho within bounds
-                this.rho = min(max(this.rho, this.options.rho_min), this.options.rho_max);
-            end
-            
-            this.flag_initial = false;
         end
         
         function solve(this)
+            % minimize m(s) = g'*s + 1/2*s'*H's + 1/3*sigma*|s|^3
+            % version 1: solve exactly by separating the problem, using the
+            % full hessian
+            
             % solve rotated trust-region subproblem
             for j = 1:this.dim
                 c0 = 0;
                 c1 = this.b(j);
                 c2 = this.D(j,j)/2;
-                c3 = this.rho(j)/6;
                 c4 = this.sigma/6;
-                this.y(j) = noodles.SubproblemScmcr.min_poly(c0,c1,c2,c3,c4,-this.delta,this.delta);
+                this.y(j) = noodles.SubproblemCr.min_poly(c0,c1,c2,0,c4,-inf,inf);
             end
-            
             % compute step
             this.step = this.Q*this.y;
             this.stepnorm = norm(this.step, 2);
+            
+            % question: is it also possible to solve the problem
+            % sufficiently accurate without using the full hessian, but
+            % only hessian-vector products? and is this more reliable and
+            % faster than using e.g. sr1 approximations for the hessian?
         end
         
         function accept_step = evaluate(this, fval_new)
             
-            this.sufficient_decrease = fval_new < this.fval - this.options.alpha * sum(abs(this.y).^3);
+            % compute prediction ratio
+            fval_diff = this.fval - fval_new;
+            m = this.fval ...
+                + this.grad'*this.step ...
+                + 1/2*this.step'*this.hess*this.step ...
+                + 1/6*this.sigma * norm(this.step, 2)^3;
             
+            pred_diff = this.fval - m;
+            this.ratio = fval_diff / pred_diff;
+            
+            % accept anyway
             accept_step = fval_new < this.fval;
         end
         
         function handle_accept_step(this, accept_step)
-            
             if ~accept_step
-                
-                this.sigma = this.options.eta_s * this.sigma;
-                this.sigma = max([this.sigma, this.options.sigma_min]);
-                
-            else % step was accepted
-                
-                if true || this.sufficient_decrease
-                    this.sigma = this.options.eta_v * this.sigma;
-                    this.sigma = max([this.sigma, this.options.sigma_min]);
+                this.sigma = 2*this.sigma;
+            else
+                if this.ratio >= this.options.eta_2
+                    this.sigma = max([0.5*this.sigma, 1e-10]);
+                elseif this.ratio <= this.options.eta_1
+                    this.sigma = 1.5*this.sigma;
                 end
             end
-            
         end
-        
+
     end
     
     methods (Static)
-        
+       
         function options = get_options(options_in)
             options = struct();
-            options.rho0        = 1;
-            options.rho_max     = 1e3;
-            options.rho_min     = -options.rho_max;
-            options.delta0      = 2; % 2
-            options.eta_v       = 0.5;
-            options.eta_s       = 10; % 10
-            options.sigma0      = 0; % 0
-            options.sigma_min   = 0.1;
-            options.alpha       = 1e-4;
-            options.tol         = 1e-8;
-            options.roundoff    = sqrt(eps);
+            options.epsilon = 1e-5;
+            options.sigma0  = 1;
+            options.theta   = 1e-4;
+            options.eta_1   = 0.1;
+            options.eta_2   = 0.9;
             
             % fill from input
             cell_fieldnames = fieldnames(options);
@@ -145,12 +114,12 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
             
         end
         
-        function z = min_poly(c0, c1, c2, c3, c4, DeltaNeg, DeltaPos)
+         function z = min_poly(c0, c1, c2, c3, c4, DeltaNeg, DeltaPos)
             % compute the minimum of the function h in [DeltaNeg,DeltaPos]
             
             h = @(z) c0 + c1*z + c2*z^2 + c3*z^3 + c4*abs(z)^3;
             zs = [DeltaNeg,DeltaPos];
-            argmin = @(zs, fun) noodles.SubproblemScmcr.argmin(zs, fun);
+            argmin = @(zs, fun) noodles.SubproblemCr.argmin(zs, fun);
             if c2 == 0 && c3 == 0 && c4 == 0
                 z = argmin(zs,h);
             elseif c2 ~= 0 && c3 == 0 && c4 == 0
@@ -175,8 +144,8 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
                     z = argmin(zs,h);
                 end
             elseif c4 ~= 0
-                zneg = noodles.SubproblemScmcr.min_poly(c0,c1,c2,c3-c4,0,DeltaNeg,0);
-                zpos = noodles.SubproblemScmcr.min_poly(c0,c1,c2,c3+c4,0,0,DeltaPos);
+                zneg = noodles.SubproblemCr.min_poly(c0,c1,c2,c3-c4,0,DeltaNeg,0);
+                zpos = noodles.SubproblemCr.min_poly(c0,c1,c2,c3+c4,0,0,DeltaPos);
                 z = argmin([zneg,zpos],h);
             end
             
@@ -191,7 +160,7 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
             for j=2:n
                 z_new = zs(j);
                 fval_new = fun(z_new);
-                if fval_new < fval
+                if ~isfinite(fval) || (fval_new < fval && isfinite(fval_new))
                     z = z_new;
                     fval = fval_new;
                 end
