@@ -1,6 +1,6 @@
 classdef SubproblemCr < noodles.NoodleSubproblem
-    % Cubic regularization
-
+    % Cubic regularization.
+    
     properties ( GetAccess = 'public', SetAccess = 'private' )
         sigma;
         ratio;
@@ -53,11 +53,6 @@ classdef SubproblemCr < noodles.NoodleSubproblem
             % compute step
             this.step = this.Q*this.y;
             this.stepnorm = norm(this.step, 2);
-            
-            % question: is it also possible to solve the problem
-            % sufficiently accurate without using the full hessian, but
-            % only hessian-vector products? and is this more reliable and
-            % faster than using e.g. sr1 approximations for the hessian?
         end
         
         function accept_step = evaluate(this, fval_new)
@@ -87,11 +82,11 @@ classdef SubproblemCr < noodles.NoodleSubproblem
                 end
             end
         end
-
+        
     end
     
     methods (Static)
-       
+        
         function options = get_options(options_in)
             options = struct();
             options.epsilon = 1e-5;
@@ -114,7 +109,7 @@ classdef SubproblemCr < noodles.NoodleSubproblem
             
         end
         
-         function z = min_poly(c0, c1, c2, c3, c4, DeltaNeg, DeltaPos)
+        function z = min_poly(c0, c1, c2, c3, c4, DeltaNeg, DeltaPos)
             % compute the minimum of the function h in [DeltaNeg,DeltaPos]
             
             h = @(z) c0 + c1*z + c2*z^2 + c3*z^3 + c4*abs(z)^3;
