@@ -2,7 +2,7 @@ classdef SubproblemScmcr < noodles.NoodleSubproblem
     %UNTITLED Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    properties ( GetAccess = 'public', SetAccess = 'private' )
         Q;
         D;
         b;

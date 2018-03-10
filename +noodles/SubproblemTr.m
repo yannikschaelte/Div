@@ -1,6 +1,6 @@
 classdef SubproblemTr < noodles.NoodleSubproblem
 
-    properties
+    properties ( GetAccess = 'public', SetAccess = 'private' )
         tr_radius;
         ratio;
     end

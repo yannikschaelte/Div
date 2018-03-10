@@ -1,4 +1,6 @@
 classdef NoodleResults < handle
+    % The NoodleResults class contains all relevant information about a
+    % finished optimization run.
 
     properties ( GetAccess = 'public', SetAccess = 'private' )
         x0;

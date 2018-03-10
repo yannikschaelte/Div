@@ -1,6 +1,9 @@
 classdef NoodleProblem < handle
+    % The NoodleProblem class administers the optimization routine. In the
+    % constructor, pass all relevant data, and then call run_optimization()
+    % to run the optimization.
     
-    properties
+    properties  ( GetAccess = 'public', SetAccess = 'private' )
         objfun;
         x0;
         dim;

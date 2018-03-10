@@ -1,6 +1,9 @@
 classdef (Abstract) NoodleSubproblem < handle
+    % The NoodleSubproblem class administers the local search for the next
+    % evaluation point. Deriving classes have to implement diverse methods 
+    % used in NoodleProblem.run_optimization().
     
-    properties
+    properties ( GetAccess = 'public', SetAccess = 'protected' )
         options;
         
         dim;
