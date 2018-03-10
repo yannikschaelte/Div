@@ -92,7 +92,13 @@ classdef NoodleProblem < handle
         end
         
         function success = update_state(this,x)
-            [fval,grad,hess] = this.objfun(x);
+            switch this.options.hessian_fcn
+                case noodles.NoodleOptions.objective
+                    [fval,grad,hess] = this.objfun(x);
+                case noodles.NoodleOptions.sr1
+                    [fval,grad] = this.objfun(x);
+                    hess = this.sr1(grad);
+            end
             this.state.feval_count = this.state.feval_count + 1;
             
             if ~isfinite(fval) || ~all(isfinite(grad)) || ~all(all(isfinite(hess)))
@@ -102,7 +108,7 @@ classdef NoodleProblem < handle
                 
                 this.state.x    = x;
                 this.state.fval = fval;
-                this.state.grad = grad;
+                this.state.grad = grad(:);
                 this.state.hess = hess;
                 this.state.gradnorm = norm(grad, 2);
                 this.state.fvaldiff = fval_old - fval;
@@ -145,6 +151,26 @@ classdef NoodleProblem < handle
                 fprintf('%d\t%d\t%.6e\n', this.state.iter_count,this.state.feval_count,this.state.fval);
             end
         end
+       
+        function hess = sr1(this, grad)
+            if all(all(isfinite(this.state.hess)))
+                grad_prev = this.state.grad;
+                hess_prev = this.state.hess;
+                step      = this.subproblem.step;
+
+                y = grad - grad_prev;
+                den = (y - hess_prev * step)' * step;
+                if abs(den) >= sqrt(eps)
+                    num = (y - hess_prev * step) * (y - hess_prev * step)';
+                    hess = hess_prev + num / den;
+                else
+                    hess = hess_prev;
+                end
+            else
+                hess = eye(this.dim);
+            end
+        end
+        
     end
 end
 

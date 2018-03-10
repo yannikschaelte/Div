@@ -9,6 +9,8 @@ classdef NoodleState < handle
         fvaldiff;
         iter_count;
         feval_count;
+        
+        meta
     end
     
     methods
@@ -21,6 +23,7 @@ classdef NoodleState < handle
             this.fvaldiff = inf;
             this.iter_count = 0;
             this.feval_count = 0;
+            this.meta = struct();
         end
 
     end

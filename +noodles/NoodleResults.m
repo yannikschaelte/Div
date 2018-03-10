@@ -1,8 +1,7 @@
 classdef NoodleResults < handle
 
     properties ( GetAccess = 'public', SetAccess = 'private' )
-        init_x;
-        init_fval;
+        x0;
         final_x;
         final_fval;
         final_grad;
@@ -19,8 +18,7 @@ classdef NoodleResults < handle
         function results = NoodleResults(problem)
             % Constructor
             if isa(problem,'noodles.NoodleProblem')
-                results.init_x          = problem.init_x;
-                results.init_fval       = problem.init_fval;
+                results.x0              = problem.x0;
                 results.final_x         = problem.state.x;
                 results.final_fval      = problem.state.fval;
                 results.final_grad      = problem.state.grad;
