@@ -27,6 +27,10 @@ classdef NoodleProblem < handle
         end
         
         function results = run_optimization(this)
+            % Run optimization
+            % 
+            % Output:
+            % results    : NoodleResults object
             
             % initialize the optimization problem
             this.init();
@@ -76,6 +80,8 @@ classdef NoodleProblem < handle
         end
         
         function init(this)
+            % Initialize/clear all variables
+            
             this.start_time = cputime;
             this.exitflag = nan;
             this.state = noodles.NoodleState(this.dim);      
@@ -92,11 +98,16 @@ classdef NoodleProblem < handle
         end
         
         function fval = compute_fval(this, x)
+            % Wrapper for computing just the function value
+            
             fval = this.objfun(x);
             % this.state.feval_count = this.state.feval_count + 1;
         end
         
         function success = update_state(this, x)
+            % In the state, update the position, function value and 
+            % derivatives
+            
             [fval,grad,hess] = this.options.derivative_fcn(this, x);
             this.state.feval_count = this.state.feval_count + 1;
             
@@ -118,6 +129,8 @@ classdef NoodleProblem < handle
         end
         
         function check_termination(this)
+            % Check all termination conditions and set exitflag accordingly
+            
             this.state.iter_count = this.state.iter_count + 1;
             
             if this.state.gradnorm < this.options.tol_grad
@@ -133,10 +146,15 @@ classdef NoodleProblem < handle
         end
         
         function bool_cont = cont(this)
+            % Return true if optimization should be continued, false if any
+            % termination condition has been hit
+            
             bool_cont = isnan(this.exitflag);
         end
         
         function print(this)
+            % Output function, during optimization.
+            
             if this.options.verbosity ~= 0
                 if mod(this.state.iter_count,10) == 0
                     fprintf('iter\tfeval\tfval\n');
@@ -146,6 +164,7 @@ classdef NoodleProblem < handle
         end
         
         function print_final(this)
+            % Final output function, after optimization.
             if this.options.verbosity ~= 0
                 fprintf('final value found:\n');
                 fprintf('iter\tfeval\tfval\n');
@@ -158,11 +177,14 @@ classdef NoodleProblem < handle
     methods (Static)
         
         function [fval, grad, hess] = objective(problem, x)
+            % Take hessian from third output of objective function.
+            
             [fval,grad,hess] = problem.objfun(x);
         end
         
         function [fval, grad, hess] = sr1(problem, x)
             % Update hessian via Symmetric Rank 1 update.
+            
             [fval,grad] = problem.objfun(x);
             
             if problem.flag_initial
@@ -185,6 +207,7 @@ classdef NoodleProblem < handle
         
         function [fval, grad, hess] = dfp(problem, x)
             % Update hessian via Davidon-Fletcher-Powell formula.
+            
             [fval,grad] = problem.objfun(x);
             
             if problem.flag_initial
@@ -206,6 +229,7 @@ classdef NoodleProblem < handle
         
         function [fval, grad, hess] = bfgs(problem, x)
             % Update hessian via Broyden-Fletcher-Goldfarb-Shanno formula.
+            
             [fval,grad] = problem.objfun(x);
             
             if problem.flag_initial

@@ -23,10 +23,16 @@ classdef (Abstract) NoodleSubproblem < handle
     methods
         
         function this = NoodleSubproblem()
-            % Constructor, is called implicitly
+            % Constructor, called implicitly.
         end
         
-        function init(this, noodle_problem)    
+        function init(this, noodle_problem)
+            % Initialize/clear the subproblem, pull required data from the
+            % NoodeProblem.
+            %
+            % Input:
+            % noodle_problem    : super NoodleProblem instance
+            
             this.dim        = noodle_problem.dim;
             this.lb         = noodle_problem.options.lb;
             this.ub         = noodle_problem.options.ub;
@@ -38,6 +44,11 @@ classdef (Abstract) NoodleSubproblem < handle
         end
         
         function update(this, state)
+            % Update values after state has changed.
+            %
+            % Input:
+            % state   : NoodleState from the super NoodleProblem
+            
             this.x    = state.x;
             this.fval = state.fval;
             this.grad = state.grad;
@@ -48,22 +59,30 @@ classdef (Abstract) NoodleSubproblem < handle
     
     methods (Abstract)
         
-        % solve the subproblem and update the step variable so that x+s
-        % indicates the predicted best next point
+        % Solve the subproblem and update the step variable so that x+step
+        % indicates the predicted best next evaluation point.
         solve(this)
         
-        % evaluate objfun(x+s) and return whether this step should be
-        % accepted
+        % Determine whether the beforehand computed step should be
+        % accepted.
+        %
+        % Input:
+        % fval_new  : objfun(x+step)
         accept_step = evaluate(this, fval_new)
         
-        % update internal state according to whether the last step can be
-        % accepted or not
+        % Update internal state according to whether the last step was
+        % accepted or not. Only here relevant variables should be changed,
+        % not in evaluate(). The reason for this subdivision is that
+        % numerical issues can occur when in the outer routine the
+        % derivatives are computed (e.g. they might contain nans or infs).
         handle_accept_step(this, accept_step)
         
     end
     
     methods (Static, Abstract)
         
+        % Create an options struct filled with default values, overwrite
+        % with user input and check for validity.
         options = get_options(options_in)
         
     end
