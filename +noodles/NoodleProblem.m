@@ -248,6 +248,8 @@ classdef NoodleProblem < handle
         end
         
         function [fval, grad, hess] = custom_sr1(problem, x)
+            % Use exact hessian every problem.dim steps, else sr1 updates
+            
             if mod(problem.state.feval_count,problem.dim) == 0
                 [fval,grad,hess] = noodles.NoodleProblem.objective(problem,x);
             else

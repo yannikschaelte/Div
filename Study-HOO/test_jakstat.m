@@ -15,7 +15,7 @@ ub = parameters.max;
 
 tolFun  = 1e-10;
 tolX    = 1e-12;
-maxFunEvals = 200;
+maxFunEvals = Inf;
 maxIter     = Inf;
 x0 = 0*ones(parameters.number,1);
 
@@ -36,7 +36,7 @@ switch optimizer
         options.MaxFunctionEvaluations = maxFunEvals;
         options.MaxIterations = maxIter;
         options.HessianFcn = 'objective'; % as 3rd output of fun
-        options.SubproblemAlgorithm = 'factorization';
+        options.SubproblemAlgorithm = 'cg'; % 'factorization'
         options.SpecifyObjectiveGradient = true;
         [x,fval,exitflag,output] = fmincon(fun,x0,[],[],[],[],parameters.min,parameters.max,[],options);
     case 'scmcr'

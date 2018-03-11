@@ -73,12 +73,12 @@ classdef SubproblemCr < noodles.NoodleSubproblem
         
         function handle_accept_step(this, accept_step)
             if ~accept_step
-                this.sigma = 2*this.sigma;
+                this.sigma = this.options.gamma_1*this.sigma;
             else
                 if this.ratio >= this.options.eta_2
-                    this.sigma = max([0.5*this.sigma, 1e-10]);
+                    this.sigma = max([this.options.gamma_2*this.sigma, this.options.sigma_min]);
                 elseif this.ratio <= this.options.eta_1
-                    this.sigma = 1.5*this.sigma;
+                    this.sigma = this.options.gamma_1*this.sigma;
                 end
             end
         end
@@ -89,11 +89,13 @@ classdef SubproblemCr < noodles.NoodleSubproblem
         
         function options = get_options(options_in)
             options = struct();
-            options.epsilon = 1e-5;
-            options.sigma0  = 1;
-            options.theta   = 1e-4;
-            options.eta_1   = 0.1;
-            options.eta_2   = 0.9;
+            options.epsilon     = 1e-5;
+            options.sigma0      = 1;
+            options.eta_1       = 0.1;
+            options.eta_2       = 0.9;
+            options.gamma_1     = 2;
+            options.gamma_2     = 0.5;
+            options.sigma_min   = 1e-10;
             
             % fill from input
             cell_fieldnames = fieldnames(options);
