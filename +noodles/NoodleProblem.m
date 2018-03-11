@@ -247,6 +247,14 @@ classdef NoodleProblem < handle
             end
         end
         
+        function [fval, grad, hess] = custom_sr1(problem, x)
+            if mod(problem.state.feval_count,problem.dim) == 0
+                [fval,grad,hess] = noodles.NoodleProblem.objective(problem,x);
+            else
+                [fval,grad,hess] = noodles.NoodleProblem.sr1(problem,x);
+            end
+        end
+        
     end
 end
 

@@ -57,6 +57,7 @@ switch optimizer
         [x,fval,meta] = yopt.hoo.scmcr_src(fun,x0,options);
     case 'noodles'
         options.subproblem = noodles.SubproblemCr();
+        options.derivative_fcn = @noodles.NoodleProblem.objective;
         result = noodles.noodles(fun,x0,options);
     case 'Noodles'
         options = struct();
