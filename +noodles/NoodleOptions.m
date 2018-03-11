@@ -1,7 +1,7 @@
 classdef NoodleOptions < handle
     
     properties
-        subproblem = noodles.SubproblemCr();
+        subproblem = noodles.SubproblemTr();
         
         lb  = -inf;
         ub  = inf;

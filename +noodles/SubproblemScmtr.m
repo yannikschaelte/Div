@@ -164,8 +164,8 @@ classdef SubproblemScmtr < noodles.NoodleSubproblem
                 if xi < 0
                     z = argmin(zs,h);
                 else
-                    zcrt1 = (sqrt(xi)-2*c2)/(6*c3);
-                    zcrt2 = (sqrt(xi)+2*c2)/(6*c3);
+                    zcrt1 = (-2*c2-sqrt(xi))/(6*c3);
+                    zcrt2 = (-2*c2+sqrt(xi))/(6*c3);
                     if DeltaNeg < zcrt1 && zcrt1 < DeltaPos
                         zs = [zs zcrt1];
                     end

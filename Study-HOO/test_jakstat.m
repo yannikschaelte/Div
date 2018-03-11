@@ -56,7 +56,8 @@ switch optimizer
         options.maxFunEvals = maxFunEvals;
         [x,fval,meta] = yopt.hoo.scmcr_src(fun,x0,options);
     case 'noodles'
-        result = noodles.noodles(fun,x0);
+        options.subproblem = noodles.SubproblemCr();
+        result = noodles.noodles(fun,x0,options);
     case 'Noodles'
         options = struct();
         options.tolGrad = tolX;
