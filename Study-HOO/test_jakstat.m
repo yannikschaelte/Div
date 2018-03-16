@@ -3,10 +3,9 @@ function [] = test_jakstat(optimizer)
 rng(0);
 
 exdir=fileparts(which('test_jakstat.m'));
-addpath('..');
+addpath('../../NOODLES');
 addpath('../testmodels/jakstat');
 % addpath('../../Noodles');
-addpath('..');
 load('data_jakstat','D');
 fun = @(x) nllh_jakstat(x,D);
 parameters = get_parameters_jakstat();
@@ -36,7 +35,7 @@ switch optimizer
         options.MaxFunctionEvaluations = maxFunEvals;
         options.MaxIterations = maxIter;
         options.HessianFcn = 'objective'; % as 3rd output of fun
-        options.SubproblemAlgorithm = 'cg'; % 'factorization'
+        options.SubproblemAlgorithm = 'factorization'; % 'cg' 'factorization'
         options.SpecifyObjectiveGradient = true;
         [x,fval,exitflag,output] = fmincon(fun,x0,[],[],[],[],parameters.min,parameters.max,[],options);
     case 'scmcr'
@@ -58,7 +57,7 @@ switch optimizer
     case 'noodles'
         options.subproblem = noodles.SubproblemCr();
         options.derivative_fcn = @noodles.NoodleProblem.objective;
-        result = noodles.noodles(fun,x0,options);
+        result = noodles(fun,x0,options);
     case 'Noodles'
         options = struct();
         options.tolGrad = tolX;
@@ -70,7 +69,7 @@ switch optimizer
         error(['Could not recognize optimizer ' optimizer]);
 end
 
-used_time = cputime - used_time;
+used_time = cputime - used_time
 
 save(fullfile(exdir, [ 'test_jakstat_' optimizer '.mat']));
 

@@ -76,6 +76,13 @@ classdef SubproblemTr < noodles.NoodleSubproblem
             
         end
         
+        function step = solve_tr_subproblem(grad, hess, tr_radius)
+            [V,D] = eig(hess); % hess = V*D*V^{-1}
+            E = diag(D);
+            [min_E, j_min_E] = min(E);
+            
+        end
+        
     end
 end
 
