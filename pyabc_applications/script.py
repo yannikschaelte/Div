@@ -53,6 +53,8 @@ sampler = ConcurrentFutureSampler(pool)
 
 # PREPARE ABC
 
+# for real run: 800 cores, initial population size 500
+
 abc = ABCSMC(models=model,
              parameter_priors=prior,
              distance_function=distance,
