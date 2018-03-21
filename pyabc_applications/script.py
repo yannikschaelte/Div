@@ -1,4 +1,5 @@
 import numpy as np
+import time
 from concurrent.futures import ThreadPoolExecutor
 from pyabc import Distribution, RV, ABCSMC
 from pyabc.sampler import ConcurrentFutureSampler
@@ -50,7 +51,7 @@ distance = Tumor2DDistance(data_var)
 pool = ThreadPoolExecutor(max_workers=2)
 sampler = ConcurrentFutureSampler(pool)
 
-# ABC
+# PREPARE ABC
 
 abc = ABCSMC(models=model,
              parameter_priors=prior,
@@ -61,5 +62,15 @@ abc = ABCSMC(models=model,
 abc.new(db="sqlite:////tmp/test.db",
         observed_sum_stat=observation)
 
+# RUN ABC
+
+start_time = time.time()
+
+print("start abc.run, ", time.asctime(time.localtime(start_time)))
+
 history = abc.run(max_nr_populations=1,
                   minimum_epsilon=0)
+
+used_time = time.time() - start_time
+
+print("done abc.run, ", used_time)
