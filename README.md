@@ -1,2 +1,2 @@
 # Div
-Temporary stuff from diverse projects.
+Temporary stuff for diverse projects.

@@ -11,12 +11,32 @@ addpath(fullfile(exdir,'data'));
 shapes = {1,1.1,1.5,1.7,2,3};
 nShapes = length(shapes);
 for j = 1:nShapes
-%     run_jakstat(shapes{j},'');
-%     run_jakstat(shapes{j},'_outlier');
+    run_jakstat(shapes{j},'');
+    run_jakstat(shapes{j},'_outlier');
     run_jakstat(shapes{j},'_outlier2');
 end
 
 %% Analyze
+
+cell_outlier = {'','_outlier','_outlier2'};
+markers = {'o','+','*','x','s','d','^','v','<','>','p','h','o','+','*','x','s','d','^','v','<','>','p','h','o','+','*','x','s','d','^','v','<','>','p','h'};
+
+% waterfalls
+figure('name','waterfalls-js');
+for io = 1:length(cell_outlier)
+    outlier = cell_outlier{io};
+    for is = 1:nShapes
+        shape = shapes{is};
+        filename = ['results_' num2str(shape) outlier '_standard.mat'];
+        if ~exist(filename,'file')
+            continue;
+        end
+        load(filename,'parameters_res');
+        semilogy(parameters_res.MS.logPost+100,[markers{is} '-'],'DisplayName',[num2str(shape) outlier]);
+        hold on;
+    end
+end
+legend('show');
 
 load('data_jakstat_outlier.mat','D');
 
@@ -25,7 +45,6 @@ amiOptions.atol = 1e-10;
 amiOptions.sensi_meth = 'forward';
 amiOptions.sensi = 0;
 
-cell_outlier = {'','_outlier'};
 for io = 1:length(cell_outlier)
     outlier = cell_outlier{io};
     for is = 1:nShapes

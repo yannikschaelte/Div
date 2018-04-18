@@ -4,11 +4,6 @@ x.p=1*ones(17,1);
 nparams = struct('maxit',1000,'toler',1.0e-4,'method','direct');
 fun = @testFun;
 
-addpath('../dfo_tests');
-% fun = @TF.f_rosenbrock;
-
-
-
 [exdir,~,~]=fileparts(which('mainJakstatSignaling.m'));
 addpath(genpath('../examples'));
 %% Data
@@ -32,7 +27,7 @@ fun = @(theta) logLikelihoodJakstat(theta, amiData);
 % x.f
 % 
 tic
-[p,fval,meta] = rsc(fun,x.p);
+[p,fval,meta] = scmtr_src(fun,x.p);
 toc
 fval,meta.iterations
 %

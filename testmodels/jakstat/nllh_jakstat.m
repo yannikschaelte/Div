@@ -7,6 +7,8 @@ amiOptions.sensi_meth = 'adjoint';
 % for every experiment and replicate, do the optimization
 n_e = size(D,2);
 
+% disp(num2str(nargout));
+
 % prepare output and sensi
 switch nargout
     case 1
