@@ -1,7 +1,7 @@
 % simulate_jakstat_normal_standard.m is the matlab interface to the cvodes mex
 %   which simulates the ordinary differential equation and respective
 %   sensitivities according to user specifications.
-%   this routine was generated using AMICI commit 65b21e55803e53baf99ad77b9f15cef2afc2ccd7 in branch master in repo https://github.com/icb-dcm/amici.
+%   this routine was generated using AMICI commit 65b21e55803e53baf99ad77b9f15cef2afc2ccd7 in branch master in repo .
 %
 % USAGE:
 % ======
