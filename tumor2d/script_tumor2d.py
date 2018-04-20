@@ -51,12 +51,13 @@ distance = Tumor2DDistance(data_var)
 
 # SAMPLER
 
-# sampler = RedisEvalParallelSampler(host="wastl", port=8765)
-sampler = SingleCoreSampler()
+sampler = RedisEvalParallelSampler(host="wastl", port=8765)
+# sampler = SingleCoreSampler()
 
 # POPULATION STRATEGY
 
 population_size = AdaptivePopulationSize(start_nr_particles=500)
+population_size = 300
 
 # PREPARE ABC
 
@@ -68,7 +69,7 @@ abc = ABCSMC(models=model,
              population_size=population_size,
              sampler=sampler)
 
-db_file = 'sqlite:////tmp/test.db'
+db_file = 'sqlite:////home/icb/yannik.schaelte/abc_analysis/tumor2d/tumor2d.db'
 
 abc.new(db=db_file, observed_sum_stat=observation)
 
@@ -79,4 +80,4 @@ print("start abc.run, ", time.asctime(time.localtime(start_time)))
 
 history = abc.run(max_nr_populations=30, minimum_epsilon=0)
 
-print("done abc.run, {time.time() - start_time:.2f}s")
+print(f"done abc.run, {time.time() - start_time:.2f}s")
