@@ -3,7 +3,7 @@ import time
 from pyabc import Distribution, RV, ABCSMC, AdaptivePNormDistance
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
-from tumor2d import simulate, log_model, load_default, Tumor2DDistance
+from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance
 
 # MODEL
 
@@ -44,19 +44,16 @@ observation = data_mean
 # DISTANCE
 
 distance = Tumor2DDistance(data_var)
-#distance = AdaptivePNormDistance(p=2, 
-#                                 use_all_w=True, 
-#                                 adaptive=True, 
-#                                 scale_type=AdaptivePNormDistance.SCALE_TYPE_SD)
+distance = AdaptiveTumor2DDistance()
 
 # SAMPLER
 
-sampler = RedisEvalParallelSampler(host="wastl", port=8765)
-# sampler = SingleCoreSampler()
+#sampler = RedisEvalParallelSampler(host="wastl", port=8765)
+sampler = SingleCoreSampler()
 
 # POPULATION STRATEGY
 
-population_size = AdaptivePopulationSize(start_nr_particles=500)
+# population_size = AdaptivePopulationSize(start_nr_particles=500)
 population_size = 5
 
 # PREPARE ABC

@@ -2,11 +2,8 @@ from .simulate import nr_valid
 import numpy as np
 from pyabc import AdaptivePNormDistance
 
-
 class Tumor2DDistance:
-    """
-    No subclass of pyabc.Distance, so will be converted to SimpleFunctionDistance.
-    """
+    __name__ 
     def __init__(self, variances: dict):
         self.variances = {key: val[:nr_valid(val)]
                           for key, val in variances.items()}
@@ -32,30 +29,27 @@ class Tumor2DDistance:
 
 
 class AdaptiveTumor2DDistance(AdaptivePNormDistance):
-    """
-    Make it adaptive.
-    """
-
     def initialize(self, t, sample_from_prior):
-        normalized_sum_stats = []
-        for sum_stats in sample_from_prior:
-            normalized_sum_stats.append(normalize_sum_stats(sum_stats))
-        super().initialize(t, normalized_sum_stats)
+        sum_stats = []
+        for sum_stat in sample_from_prior:
+            sum_stats.append(normalize_sum_stats(sum_stat))
+        super().initialize(t, sum_stats)
 
     def update(self, t, all_sum_stats):
-        normalized_sum_stats = []
-        for sum_stats in all_sum_stats:
-            normalized_sum_stats.append(normalize_sum_stats(sum_stats))
-        super().update(t, all_sum_stats)
+        sum_stats = []
+        for sum_stat in all_sum_stats:
+            sum_stats.append(normalize_sum_stats(sum_stat))
+        super().update(t, sum_stats)
 
     def __call__(self, t, x, y):
         x = normalize_sum_stats(x)
         y = normalize_sum_stats(y)
-        super().call(t, x, y)
+        return super().__call__(t, x, y)
 
 
 def normalize_sum_stats(x):
-    """
-    Flatten.
-    """
-    return x
+    x_flat = {}
+    for key, value in x.items():
+        for j in range(len(value)):
+            x_flat[(key, j)] = value[j]
+    return x_flat
