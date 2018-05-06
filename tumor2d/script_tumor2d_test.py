@@ -1,9 +1,9 @@
 import numpy as np
 import time
-from pyabc import Distribution, RV, ABCSMC, AdaptivePNormDistance
+from pyabc import Distribution, RV, ABCSMC, AdaptivePNormDistance, LocalTransition
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
-from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance
+from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance, non_weighted_tumor2ddistance
 
 # MODEL
 
@@ -44,7 +44,8 @@ observation = data_mean
 # DISTANCE
 
 distance = Tumor2DDistance(data_var)
-distance = AdaptiveTumor2DDistance()
+distance = non_weighted_tumor2ddistance
+#distance = AdaptiveTumor2DDistance()
 
 # SAMPLER
 
@@ -56,6 +57,9 @@ sampler = SingleCoreSampler()
 # population_size = AdaptivePopulationSize(start_nr_particles=500)
 population_size = 5
 
+# TRANSITION STRATEGY
+transition = LocalTransition(k=2)
+
 # PREPARE ABC
 
 # for real run: 100 cores, initial population size 500
@@ -64,6 +68,7 @@ abc = ABCSMC(models=model,
              parameter_priors=prior,
              distance_function=distance,
              population_size=population_size,
+             transitions=transition,
              sampler=sampler)
 
 db_file = 'sqlite:////home/icb/yannik.schaelte/abc_analysis/tumor2d/tumor2d.db'

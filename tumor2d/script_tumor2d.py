@@ -1,6 +1,6 @@
 import numpy as np
 import time
-from pyabc import Distribution, RV, ABCSMC
+from pyabc import Distribution, RV, ABCSMC, LocalTransition
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
 from tumor2d import simulate, log_model, load_default, Tumor2DDistance
@@ -56,8 +56,12 @@ sampler = RedisEvalParallelSampler(host="wastl", port=8765)
 
 # POPULATION STRATEGY
 
-# population_size = AdaptivePopulationSize(start_nr_particles=500, mean_cv=0.25)
-population_size = 300
+population_size = AdaptivePopulationSize(start_nr_particles=500, mean_cv=0.25, n_bootstrap=5)
+# population_size = 300
+
+# TRANSITION STRATEGY
+
+transition = LocalTransition(k=100)
 
 # PREPARE ABC
 
@@ -67,6 +71,7 @@ abc = ABCSMC(models=model,
              parameter_priors=prior,
              distance_function=distance,
              population_size=population_size,
+             transitions=transition,
              sampler=sampler)
 
 db_file = 'sqlite:////home/icb/yannik.schaelte/abc_analysis/tumor2d/tumor2d.db'
