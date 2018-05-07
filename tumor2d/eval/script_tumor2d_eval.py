@@ -17,13 +17,13 @@ limits = dict(log_division_rate=(-3, -1),
 prior = pyabc.Distribution(**{key: pyabc.RV('uniform', a, b - a)
                               for key, (a, b) in limits.items()})
 
-h_loaded_adap = pyabc.History("sqlite:////media/sf_shared/tumor2d_2.db")
+h_loaded_adap = pyabc.History("sqlite:////media/sf_Downloads/tumor2d_2.db")
 h_loaded_adap.id = 9
 
-h_loaded_prev = pyabc.History("sqlite:////media/sf_shared/tumor2d_2.db")
+h_loaded_prev = pyabc.History("sqlite:////media/sf_Downloads/tumor2d.db")
 h_loaded_prev.id = 1
 
-h_loaded_prev1 = pyabc.History("sqlite:////media/sf_shared/tumor2d_1.db")
+h_loaded_prev1 = pyabc.History("sqlite:////media/sf_Downloads/tumor2d_1.db")
 h_loaded_prev1.id = 1
 
 h_loaded_dflt = pyabc.History("sqlite:///" + tumor2d.stored_data_db)
@@ -89,5 +89,6 @@ def epsilon():
     fig.savefig("eps")
     plt.close()
 
+kde_plots("prev")
 samples()
 epsilon()
