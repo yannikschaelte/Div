@@ -63,7 +63,7 @@ def samples():
     
     t = np.arange(0,40)
     fig = plt.figure()
-    plt.plot(t[:31],samples_dflt.values[:31], 'mo-', label="dflt")
+    plt.plot(t[:30],samples_dflt.values[:30], 'mo-', label="dflt")
     plt.plot(t[:len(samples_prev.values)],samples_prev.values, 'bo-', label="prev")
     plt.plot(t[:len(samples_prev1.values)],samples_prev1.values, 'go-', label="prev1")
     plt.plot(t[:len(samples_adap.values)],samples_adap.values, 'ro-', label="adap")
@@ -81,7 +81,7 @@ def epsilon():
 
     t = np.arange(0,40)
     fig = plt.figure()
-    plt.plot(t[:31],np.log(eps_dflt.values[:31]), 'mo-', label="dflt")
+    plt.plot(t[:30],np.log(eps_dflt.values[:30]), 'mo-', label="dflt")
     plt.plot(t[:len(eps_prev.values)],np.log(eps_prev.values), 'bo-', label="prev")
     plt.plot(t[:len(eps_prev1.values)],np.log(eps_prev1.values), 'go-', label="prev1")
     plt.plot(t[:len(eps_adap.values)],np.log(eps_adap.values), 'ro-', label="adap")
@@ -89,6 +89,6 @@ def epsilon():
     fig.savefig("eps")
     plt.close()
 
-kde_plots("prev")
+# kde_plots("prev")
 samples()
 epsilon()

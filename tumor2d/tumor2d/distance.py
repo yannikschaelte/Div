@@ -28,19 +28,13 @@ class Tumor2DDistance:
         return {}
 
 
-def non_weighted_tumor2ddistance(x: dict, y: dict) -> float:
-    length = {key: min([len(x[key]),
-                        len(y[key])]) for key in y}
-    return sum(np.sum((x[key][:length[key]] - y[key][:length[key]])**2) for key in length.keys())
-
-
 class AdaptiveTumor2DDistance(AdaptivePNormDistance):
     
 
-    def __init__(self):
+    def __init__(self, adaptive=True):
         super().__init__(p=2, 
                          use_all_w=True, 
-                         adaptive=True, 
+                         adaptive=adaptive,
                          scale_type=AdaptivePNormDistance.SCALE_TYPE_SD)
     
     def initialize(self, t, sample_from_prior):
