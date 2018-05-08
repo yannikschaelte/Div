@@ -70,20 +70,18 @@ def dhc_options(options_in=None) -> YDict:
 	options = YDict()
 	options.TolX                = 1e-8;
 	options.TolFun              = 1e-8;
-	options.MaxFunEvals         = Inf;
-	options.OutputFcn           = nan;
+	options.MaxFunEvals         = np.inf;
 	options.InitialStepSize     = 0.1;
 	options.ExpandFactor        = 2.1;
 	options.ContractFactor      = 0.47;
 	options.StuckSearchFactor   = 4;
-	options.Barrier             = '';
 	options.Display             = 'off';
 	
 	# fill from input
 	
 	for key in options_in:
 		if not key in options:
-			raise KeyError("Options field" + str(key) + " does not exist.")
+			raise KeyError("Options field " + str(key) + " does not exist.")
 		options[key] = options_in[key]
 		
 	return options
