@@ -2,6 +2,11 @@ import numpy as np
 import scipy as sp
 
 
+class YDict(dict):
+	__getattr__ = dict.__getitem__
+	__setattr__ = dict.__setitem__
+	
+
 def dhc(fun, x0, lb, ub, options=None):
 	"""
 	Optimization via Dynamic Hill Climbing. Based on 
@@ -41,10 +46,10 @@ def dhc(fun, x0, lb, ub, options=None):
 	x = x0.copy
 	fval = fun(x)
 	
-	return dict(x=x,fval=fval)
+	return YDict(x=x,fval=fval)
 
 	
-def dhc_options(options_in=None) -> dict:
+def dhc_options(options_in=None) -> YDict:
 	"""
 	Create default options dictionary.
 	
@@ -62,7 +67,7 @@ def dhc_options(options_in=None) -> dict:
 	
 	# initialize options with default values
 	
-	options = dict()
+	options = YDict()
 	options.TolX                = 1e-8;
 	options.TolFun              = 1e-8;
 	options.MaxFunEvals         = Inf;
