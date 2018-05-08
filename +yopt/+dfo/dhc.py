@@ -78,6 +78,9 @@ def dhc_options(options_in=None) -> YDict:
 	options.Display             = 'off';
 	
 	# fill from input
+
+	if options_in is None:
+		options_in = YDict()
 	
 	for key in options_in:
 		if not key in options:
