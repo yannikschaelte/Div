@@ -7,7 +7,7 @@ class YDict(dict):
 	__setattr__ = dict.__setitem__
 	
 
-def dhc(fun, x0, lb, ub, options=None):
+def dhc(fun, x0, lb=None, ub=None, options=None):
 	"""
 	Optimization via Dynamic Hill Climbing. Based on 
 	[De La Maza, Yuret. Dynamic Hill Climbing].
@@ -21,10 +21,9 @@ def dhc(fun, x0, lb, ub, options=None):
 	x0: ndarray, shape (n,)
 		Initial guess. Array of real elements of size (n,),
 		where 'n' is the number of independent variables.
-	lb: ndarray, shape (n,)
-		Lower bound.
-	ub: ndarray, shape (n,)
-		Upper bound.
+	lb, ub: ndarray, shape (n,), optional
+		Lower and upper bound. If not specified, the problem is
+		unbounded in either direction.
 	options: dict, optional
 		A dictionary of solver options.
 		
@@ -36,6 +35,9 @@ def dhc(fun, x0, lb, ub, options=None):
 		``fval`` the found function value.
 	"""
 	
+	# normalize input
+	x0, lb, ub = normalize_input(x0, lb, ub)
+	
 	# interpret options
 	options = dhc_options(options)
 	
@@ -43,11 +45,33 @@ def dhc(fun, x0, lb, ub, options=None):
 	dim = len(x0)
 	
 	# running variables
-	x = x0
-	fval = fun(x)
+	xbst = x0
+	fbst = fun(x)	
+	fun_evals = 1
+	done = False
+	stuck = False
 	
-	return YDict(x=x,fval=fval)
+	while not done:
+		if stuck:
+			
+	
+	
+	return YDict(x=xbst,fval=fbst)
 
+	
+def normalize_input(x0, lb, ub):
+	x0 = x0.squeeze()
+	if lb is None:
+		lb = np.ninf * np.ones_like(x0)
+	else:
+		lb = lb.squeeze()
+	if ub is None:
+		ub = np.inf * np.ones_like(x0)
+	else:
+		ub = ub.squeeze()
+	
+	return (x0, lb, ub)
+	
 	
 def dhc_options(options_in=None) -> YDict:
 	"""
