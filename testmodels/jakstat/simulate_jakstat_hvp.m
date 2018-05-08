@@ -1,13 +1,13 @@
-% simulate_jakstat.m is the matlab interface to the cvodes mex
+% simulate_jakstat_hvp.m is the matlab interface to the cvodes mex
 %   which simulates the ordinary differential equation and respective
 %   sensitivities according to user specifications.
 %   this routine was generated using AMICI commit fcf443dcf60b45c9d366e39f1df1aedeb09359b0 in branch master in repo https://github.com/icb-dcm/amici.
 %
 % USAGE:
 % ======
-% [...] = simulate_jakstat(tout,theta)
-% [...] = simulate_jakstat(tout,theta,kappa,data,options)
-% [status,tout,x,y,sx,sy] = simulate_jakstat(...)
+% [...] = simulate_jakstat_hvp(tout,theta)
+% [...] = simulate_jakstat_hvp(tout,theta,kappa,data,options)
+% [status,tout,x,y,sx,sy] = simulate_jakstat_hvp(...)
 %
 % INPUTS:
 % =======
@@ -93,7 +93,7 @@
 % sol.sy ... time-resolved output sensitivity vector
 % sol.z ... event output
 % sol.sz ... sensitivity of event output
-function varargout = simulate_jakstat(varargin)
+function varargout = simulate_jakstat_hvp(varargin)
 
 % DO NOT CHANGE ANYTHING IN THIS FILE UNLESS YOU ARE VERY SURE ABOUT WHAT YOU ARE DOING
 % MANUAL CHANGES TO THIS FILE CAN RESULT IN WRONG SOLUTIONS AND CRASHING OF MATLAB
@@ -146,6 +146,14 @@ switch (options_ami.pscale)
         chainRuleFactor = ones(size(options_ami.sens_ind));
 end
 
+if(nargin>=6)
+    v = varargin{6};
+    v = v(:).*chainRuleFactor;
+else
+    if(options_ami.sensi==2)
+        error('6th argument (multiplication vector is missing');
+    end
+end
 if(nargout>1)
     if(nargout>6)
         options_ami.sensi = 2;
@@ -162,7 +170,7 @@ if(nplist == 0)
     options_ami.sensi = 0;
 end
 if(options_ami.sensi > 1)
-    nxfull = 162;
+    nxfull = 18;
 else
     nxfull = 9;
 end
@@ -212,6 +220,9 @@ end
 if(length(kappa)<2)
     error('provided condition vector is too short');
 end
+if(nargin>=6)
+    kappa = [kappa(:);v(:)];
+end
 init = struct();
 if(~isempty(options_ami.x0))
     if(size(options_ami.x0,2)~=1)
@@ -232,9 +243,9 @@ if(~isempty(options_ami.sx0))
     init.sx0 = bsxfun(@times,options_ami.sx0,1./permute(chainRuleFactor(:),[2,1]));
 end
 if(options_ami.sensi<2)
-    sol = ami_jakstat(tout,theta(1:17),kappa(1:2),options_ami,plist,pbar(plist+1),xscale,init,data);
+    sol = ami_jakstat_hvp(tout,theta(1:17),kappa(1:2),options_ami,plist,pbar(plist+1),xscale,init,data);
 else
-    sol = ami_jakstat_o2(tout,theta(1:17),kappa(1:2),options_ami,plist,pbar(plist+1),xscale,init,data);
+    sol = ami_jakstat_hvp_o2vec(tout,theta(1:17),kappa(1:19),options_ami,plist,pbar(plist+1),xscale,init,data);
 end
 if(options_ami.sensi == 2)
     if(~(options_ami.sensi_meth==2))
@@ -246,16 +257,16 @@ if(options_ami.sensi == 2)
             ssigmaz(:,iz,:) = sol.ssigmaz(:,2*iz-1,:);
             srz(:,iz,:) = sol.srz(:,2*iz-1,:);
         end
-        sol.s2x = reshape(sol.sx(:,10:end,:),length(tout),9,17,length(options_ami.sens_ind));
-        sol.s2y = reshape(sol.sy(:,4:end,:),length(tout),3,17,length(options_ami.sens_ind));
-        sol.s2sigmay = reshape(sol.ssigmay(:,4:end,:),length(tout),3,17,length(options_ami.sens_ind));
-        s2z = zeros(size(sol.z,1),0,17,length(options_ami.sens_ind));
-        s2sigmaz = zeros(size(sol.z,1),0,17,length(options_ami.sens_ind));
-        s2rz = zeros(size(sol.z,1),0,17,length(options_ami.sens_ind));
+        sol.s2x = sol.sx(:,10:end,:);
+        sol.s2y = sol.sy(:,4:end,:);
+        sol.s2sigmay = sol.ssigmay(:,4:end,:);
+        s2z = zeros(size(sol.z,1),0,length(theta(options_ami.sens_ind)));
+        s2sigmaz = zeros(size(sol.z,1),0,length(theta(options_ami.sens_ind)));
+        s2rz = zeros(size(sol.z,1),0,length(theta(options_ami.sens_ind)));
         for iz = 1:0
-            sol.s2z(:,iz,:,:) = reshape(sol.sz(:,((iz-1)*(17+1)+2):((iz-1)*(17+1)+17+1),:),options_ami.nmaxevent,1,17,length(options_ami.sens_ind));
-            sol.s2sigmaz(:,iz,:,:) = reshape(sol.ssigmaz(:,((iz-1)*(17+1)+2):((iz-1)*(17+1)+17+1),:),options_ami.nmaxevent,1,17,length(options_ami.sens_ind));
-            sol.s2rz(:,iz,:,:) = reshape(sol.srz(:,((iz-1)*(17+1)+2):((iz-1)*(17+1)+17+1),:),options_ami.nmaxevent,1,17,length(options_ami.sens_ind));
+            sol.s2z(:,iz,:) = reshape(sol.sz(:,2*(iz-1)+2,:),options_ami.nmaxevent,1,length(theta(options_ami.sens_ind)));
+            sol.s2sigmaz(:,iz,:) = reshape(sol.ssigmaz(:,2*(iz-1)+2,:),options_ami.nmaxevent,1,length(theta(options_ami.sens_ind)));
+            sol.s2rz(:,iz,:) = reshape(sol.srz(:,2*(iz-1)+2,:),options_ami.nmaxevent,1,length(theta(options_ami.sens_ind)));
         end
         sol.sx = sol.sx(:,1:9,:);
         sol.sy = sol.sy(:,1:3,:);

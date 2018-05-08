@@ -1,7 +1,7 @@
 import os
 import numpy as np
 from .simulate import simulate, nr_valid
-from .distance import Tumor2DDistance, AdaptiveTumor2DDistance 
+from .distance import Tumor2DDistance, AdaptiveTumor2DDistance
 from .log_transform import log_transform
 
 __all__ = ["simulate", "nr_valid", "log_model"]
@@ -29,10 +29,17 @@ def load_default():
 
 def log_model(x):
     return log_transform(simulate)(**x)
-
     
     
 distance = Tumor2DDistance(load_default()[2])
+
+default_pams = dict(division_rate=4.17e-2,
+                    initial_spheroid_radius=1.2e1,
+                    initial_quiescent_cell_fraction=7.5e-1,
+                    division_depth=100,
+                    ecm_production_rate=5e-3,
+                    ecm_degradation_rate=8e-4,
+                    ecm_division_threshold=1e-2)
 
 
 def animated_gif(db, output):

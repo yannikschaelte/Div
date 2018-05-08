@@ -29,6 +29,14 @@ class Tumor2DDistance:
 
 
 class AdaptiveTumor2DDistance(AdaptivePNormDistance):
+    
+
+    def __init__(self, adaptive=True):
+        super().__init__(p=2, 
+                         use_all_w=True, 
+                         adaptive=adaptive,
+                         scale_type=AdaptivePNormDistance.SCALE_TYPE_SD)
+    
     def initialize(self, t, sample_from_prior):
         sum_stats = []
         for sum_stat in sample_from_prior:

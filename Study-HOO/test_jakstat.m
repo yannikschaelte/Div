@@ -35,7 +35,7 @@ switch optimizer
         options.MaxFunctionEvaluations = maxFunEvals;
         options.MaxIterations = maxIter;
         options.HessianFcn = 'objective'; % as 3rd output of fun
-        options.SubproblemAlgorithm = 'factorization'; % 'cg' 'factorization'
+%         options.SubproblemAlgorithm = 'cg'; % 'cg' 'factorization'
         options.SpecifyObjectiveGradient = true;
         [x,fval,exitflag,output] = fmincon(fun,x0,[],[],[],[],parameters.min,parameters.max,[],options);
     case 'scmcr'
@@ -55,9 +55,12 @@ switch optimizer
         options.maxFunEvals = maxFunEvals;
         [x,fval,meta] = yopt.hoo.scmcr_src(fun,x0,options);
     case 'noodles'
-        options.subproblem = noodles.SubproblemCr();
-        options.derivative_fcn = @noodles.NoodleProblem.objective;
-        result = noodles(fun,x0,options);
+        options.subproblem = noodles.SubproblemScr();
+        options.lb = lb;
+        options.ub = ub;
+        options.derivative_fun = @noodles.NoodleProblem.objective;
+        results = noodles(fun,x0,options);
+        results.exitflag
     case 'Noodles'
         options = struct();
         options.tolGrad = tolX;
