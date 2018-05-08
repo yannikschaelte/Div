@@ -43,7 +43,7 @@ def dhc(fun, x0, lb, ub, options=None):
 	dim = len(x0)
 	
 	# running variables
-	x = x0.copy
+	x = x0
 	fval = fun(x)
 	
 	return YDict(x=x,fval=fval)
