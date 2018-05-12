@@ -33,21 +33,22 @@ class AdaptiveTumor2DDistance(AdaptivePNormDistance):
 
     def __init__(self, adaptive=True):
         super().__init__(p=2, 
-                         use_all_w=True, 
                          adaptive=adaptive,
-                         scale_type=AdaptivePNormDistance.SCALE_TYPE_SD)
+                         scale_type=AdaptivePNormDistance.SCALE_TYPE_C_MAD)
     
-    def initialize(self, t, sample_from_prior):
+    def initialize(self, t, sample_from_prior, x_0):
         sum_stats = []
         for sum_stat in sample_from_prior:
             sum_stats.append(normalize_sum_stats(sum_stat))
-        super().initialize(t, sum_stats)
+        x_0 = normalize_sum_stats(x_0)
+        super().initialize(t, sum_stats, x_0)
 
-    def update(self, t, all_sum_stats):
+    def update(self, t, all_sum_stats, x_0):
         sum_stats = []
         for sum_stat in all_sum_stats:
             sum_stats.append(normalize_sum_stats(sum_stat))
-        super().update(t, sum_stats)
+        x_0 = normalize_sum_stats(x_0)
+        super().update(t, sum_stats, x_0)
 
     def __call__(self, t, x, y):
         x = normalize_sum_stats(x)
