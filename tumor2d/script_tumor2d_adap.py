@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import pyabc
 from pyabc import Distribution, RV, ABCSMC, LocalTransition, MultivariateNormalTransition
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
@@ -12,7 +13,7 @@ from tumor2d import simulate, log_model, load_default, Tumor2DDistance, Adaptive
 
 # MODEL
 
-model = log_model
+model = pyabc.SimpleModel(sample_function=log_model, acceptor=pyabc.accept_use_current_time)
 
 # PRIOR
 
@@ -63,8 +64,8 @@ population_size = 300
 
 # TRANSITION STRATEGY
 
-# transition = LocalTransition(k=100)
-transition = MultivariateNormalTransition()
+transition = LocalTransition(k_fraction=0.2)
+# transition = MultivariateNormalTransition()
 
 # PREPARE ABC
 
@@ -77,7 +78,7 @@ abc = ABCSMC(models=model,
              transitions=transition,
              sampler=sampler)
 
-db_file = 'sqlite:////home/icb/yannik.schaelte/abc_analysis/tumor2d/tumor2d.db'
+db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_adap.db'
 
 abc.new(db=db_file, observed_sum_stat=observation)
 
