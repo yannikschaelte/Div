@@ -43,14 +43,31 @@ def dhc(fun, x0, lb=None, ub=None, options=None):
 	
 	# number of variables
 	dim = len(x0)
+
+	# function evaluation counter
+	fun_evals = 0
+
+	# wrap function to consider boundaries
+	def wrapped_fun(x):
+		if np.any(x > ub) or np.any(x < lb):
+			return np.inf
+		else:
+			return fun(x)
 	
-	# running variables
+	# best values found
 	xbst = x0
-	fbst = fun(x)	
-	fun_evals = 1
+	fbst = wrapped_fun(xbst)
+	fun_evals += 1
+
 	done = False
 	stuck = False
-	
+
+	# max step size
+	vmax = options.InitialStepSize * np.ones_like(xbst)
+
+	# array of max step sizes, extra value for extra vector
+	smax =
+
 	while not done:
 		if stuck:
 			
@@ -70,7 +87,7 @@ def normalize_input(x0, lb, ub):
 	else:
 		ub = ub.squeeze()
 	
-	return (x0, lb, ub)
+	return x0, lb, ub
 	
 	
 def dhc_options(options_in=None) -> YDict:
@@ -79,7 +96,7 @@ def dhc_options(options_in=None) -> YDict:
 	
 	Parameters
 	----------
-	options: dict, optional
+	options_in: dict, optional
 		A dictionary with some options pre-set. Every key
 		is checked for validity.
 		
@@ -92,14 +109,14 @@ def dhc_options(options_in=None) -> YDict:
 	# initialize options with default values
 	
 	options = YDict()
-	options.TolX                = 1e-8;
-	options.TolFun              = 1e-8;
-	options.MaxFunEvals         = np.inf;
-	options.InitialStepSize     = 0.1;
-	options.ExpandFactor        = 2.1;
-	options.ContractFactor      = 0.47;
-	options.StuckSearchFactor   = 4;
-	options.Display             = 'off';
+	options.TolX                = 1e-8
+	options.TolFun              = 1e-8
+	options.MaxFunEvals         = np.inf
+	options.InitialStepSize     = 0.1
+	options.ExpandFactor        = 2.1
+	options.ContractFactor      = 0.47
+	options.StuckSearchFactor   = 4
+	options.Display             = 'off'
 	
 	# fill from input
 
