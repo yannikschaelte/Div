@@ -28,6 +28,14 @@ class Tumor2DDistance:
         return {}
 
 
+class ReweightedTumor2DDistance(Tumor2DDistance):
+    def __init__(self, variances: dict):
+        super().__init__(variances)
+        self.inv_variances['growth_curve'] /= 20
+        self.inv_variances['proliferation_profile'] /= 1000
+        self.inv_variances['extra_cellular_matrix_profile'] /= 1000
+
+
 class AdaptiveTumor2DDistance(AdaptivePNormDistance):
     
 
