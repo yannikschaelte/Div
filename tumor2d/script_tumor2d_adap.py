@@ -13,7 +13,11 @@ from tumor2d import simulate, log_model, load_default, Tumor2DDistance, Adaptive
 
 # MODEL
 
-model = pyabc.SimpleModel(sample_function=log_model, acceptor=pyabc.accept_use_current_time)
+model = log_model
+
+# ACCEPTOR
+
+acceptor = pyabc.accept_use_complete_history
 
 # PRIOR
 
@@ -76,7 +80,8 @@ abc = ABCSMC(models=model,
              distance_function=distance,
              population_size=population_size,
              transitions=transition,
-             sampler=sampler)
+             sampler=sampler,
+             acceptor=acceptor)
 
 db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_adap.db'
 
