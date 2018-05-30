@@ -29,6 +29,7 @@ class Tumor2DDistance:
 
 
 class ReweightedTumor2DDistance(Tumor2DDistance):
+    
     def __init__(self, variances: dict):
         super().__init__(variances)
         self.inv_variances['growth_curve'] /= 20
@@ -62,6 +63,18 @@ class AdaptiveTumor2DDistance(AdaptivePNormDistance):
         x = normalize_sum_stats(x)
         y = normalize_sum_stats(y)
         return super().__call__(t, x, y)
+
+
+class ReweightedAdaptiveTumor2DDistance(AdaptiveTumor2DDistance):
+
+    def update(self, t, all_sum_stats, x_0):
+        super().update(t, all_sum_stats,, x_0)
+        for key in self.w[t]:
+            a, b = key
+            if a == 'growth_curve':
+                self.w[t][key] /= 20
+            elif a == 'proliferation_profile' or a == 'extra_cellular_matrix_profile':
+                self.w[t][key] /= 1000
 
 
 def normalize_sum_stats(x):
