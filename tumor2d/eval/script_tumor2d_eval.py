@@ -29,6 +29,10 @@ h_loaded_prev1.id = 1
 h_loaded_dflt = pyabc.History("sqlite:///" + tumor2d.stored_data_db)
 
 h_loaded_ctr = pyabc.History("sqlite:////media/sf_shared/tumor2d_adap.db")
+
+h_loaded_prev_rew = pyabc.History("sqlite:////media/sf_shared/tumor2d_reweighted.db")
+h_loaded_prev_rew.id = 2
+
 # # kde plots
 
 def kde_plots(name):
@@ -43,6 +47,8 @@ def kde_plots(name):
         h_loaded = h_loaded_adap
     elif name == "ctr":
         h_loaded = h_loaded_ctr
+    elif name == "prev_rew":
+        h_loaded = h_loaded_prev_rew
 
     for t in range(h_loaded.max_t+1):
         df, w = h_loaded.get_distribution(m=0, t=t)
@@ -92,6 +98,6 @@ def epsilon():
     fig.savefig("eps")
     plt.close()
 
-kde_plots("ctr")
+kde_plots("prev_rew")
 #samples()
 #epsilon()
