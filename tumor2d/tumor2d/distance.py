@@ -1,6 +1,6 @@
 from .simulate import nr_valid
 import numpy as np
-from pyabc import AdaptivePNormDistance
+import pyabc
 
 class Tumor2DDistance:
     __name__ 
@@ -37,13 +37,13 @@ class ReweightedTumor2DDistance(Tumor2DDistance):
         self.inv_variances['extra_cellular_matrix_profile'] /= 1000
 
 
-class AdaptiveTumor2DDistance(AdaptivePNormDistance):
+class AdaptiveTumor2DDistance(pyabc.AdaptivePNormDistance):
     
 
     def __init__(self, adaptive=True):
         super().__init__(p=2, 
                          adaptive=adaptive,
-                         scale_type=AdaptivePNormDistance.SCALE_TYPE_C_MAD)
+                         scale_function=pyabc.distance_functions.median_absolute_deviation)
     
     def initialize(self, t, sample_from_prior, x_0):
         sum_stats = []
@@ -68,7 +68,7 @@ class AdaptiveTumor2DDistance(AdaptivePNormDistance):
 class ReweightedAdaptiveTumor2DDistance(AdaptiveTumor2DDistance):
 
     def update(self, t, all_sum_stats, x_0):
-        super().update(t, all_sum_stats,, x_0)
+        super().update(t, all_sum_stats, x_0)
         for key in self.w[t]:
             a, b = key
             if a == 'growth_curve':
