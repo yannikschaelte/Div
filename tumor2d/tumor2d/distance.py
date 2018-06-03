@@ -1,6 +1,8 @@
 from .simulate import nr_valid
 import numpy as np
 import pyabc
+import logging
+df_logger = logging.getLogger("DistanceFunction")
 
 class Tumor2DDistance:
     __name__ 
@@ -78,12 +80,45 @@ class ReweightedAdaptiveTumor2DDistance(AdaptiveTumor2DDistance):
 
 
 class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
+"""
+Only one weight for each of the data types growth_curve,
+proliferation_profile, extra_cellular_matrix_profile.
+"""
+    
+    def __init__(self):
+        self.w = {}
 
     def initialize(self, t, sample_from_prior, x_0):
         self._update(t, sample_from_prior, x_0)
 
     def update(self, t, all_sum_stats, x_0):
         self._update(t, sample_from_prior, x_0)
+
+    def _update(t, sample_from_prior, x_0):
+        scales = {}
+        scale_fun = pyabc.median_absolute_deviation
+        n = len(sample_from_prior)
+        w = {}
+        for key in sample_from_prior[0]:
+            max_len = max(len(sample_from_prior[j][key]) for j in range(n))
+            for j in range(max_len):
+                current_list = []
+                for ss in sample_from_prior:
+                    if len(ss[key]) > j:
+                        current_list.append(ss[key][j])
+                scale = scale_fun(current_list)
+                scales.setdefault(key, []).append(scale)
+            scale = np.mean(scales)
+            if np.isclose(scale, 0):
+                w[key] = 0
+            else:
+                w[key] = 1 / scale
+        mean_weight = np.mean(list(w.values()))
+        for key in w:
+            w[key] /= mean_weight
+
+        self.w[t] = w
+        df_logger.debug("update distance weights = {}".format(self.w[t]))
 
     def configure_sampler(self, sampler):
         sampler.sample_factory.record_all_sum_stats = True
@@ -92,10 +127,13 @@ class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
         return {"name": self.__class__.__name__}
 
     def __call__(self, t, x, y):
-        
+        w = self.w[t]
+        d = sum(
+                sum(pow(abs(w[key]*(x[key][j]-y[key][j])), 2) 
+                for j in range(min(len(x[key]), len(y[key]))))
+            for key in w)
 
-
-
+        return d
 
 def normalize_sum_stats(x):
     x_flat = {}
