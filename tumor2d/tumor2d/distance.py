@@ -80,12 +80,13 @@ class ReweightedAdaptiveTumor2DDistance(AdaptiveTumor2DDistance):
 
 
 class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
-"""
-Only one weight for each of the data types growth_curve,
-proliferation_profile, extra_cellular_matrix_profile.
-"""
+    """
+    Only one weight for each of the data types growth_curve,
+    proliferation_profile, extra_cellular_matrix_profile.
+    """
     
     def __init__(self):
+        self.require_initialize = True
         self.w = {}
 
     def initialize(self, t, sample_from_prior, x_0):
@@ -94,7 +95,7 @@ proliferation_profile, extra_cellular_matrix_profile.
     def update(self, t, all_sum_stats, x_0):
         self._update(t, sample_from_prior, x_0)
 
-    def _update(t, sample_from_prior, x_0):
+    def _update(self, t, sample_from_prior, x_0):
         scales = {}
         scale_fun = pyabc.median_absolute_deviation
         n = len(sample_from_prior)

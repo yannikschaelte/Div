@@ -4,13 +4,13 @@ import pyabc
 from pyabc import Distribution, RV, ABCSMC, AdaptivePNormDistance, LocalTransition
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
-from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance
+from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance, LessWeightsAdaptiveTumor2DDistance
 import os
 import tempfile
 
 # MODEL
 
-model = pyabc.SimpleModel(sample_function=log_model, acceptor=pyabc.accept_use_complete_history)
+model = log_model
 
 # PRIOR
 
@@ -48,6 +48,7 @@ observation = data_mean
 
 distance = Tumor2DDistance(data_var)
 distance = AdaptiveTumor2DDistance()
+distance = LessWeightsAdaptiveTumor2DDistance()
 
 # SAMPLER
 
