@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import os
 import tempfile
 import logging
+import sys
 
 
 # for debugging
@@ -39,7 +40,12 @@ def visualize(label, history):
                                     x='theta', ax=ax, 
                                     refval = {'theta': theta_true},
                                     label="PDF t={}".format(t))
-    plt.savefig(label + "_plt_kde_1d_" + str(t))
+    plt.savefig("plt_kde_1d_" +label + "_" + str(t))
+
+    samples = history.get_all_populations()['samples']
+    fig = plt.figure()
+    plt.plot(samples.values, 'o-', label="samples")
+    plt.savefig("samples_" + label + "_" + str(t))
 
 
 def simulate(method):
@@ -62,5 +68,7 @@ def simulate(method):
     h = abc.run(minimum_epsilon=0, max_nr_populations=max_nr_populations)
     visualize(method, h)
 
-
-simulate("nada")
+# command line arguments:
+# nada, mad, cmad
+method = sys.argv[1]
+simulate(method)
