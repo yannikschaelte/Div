@@ -129,7 +129,8 @@ proliferation_profile, extra_cellular_matrix_profile.
     def __call__(self, t, x, y):
         w = self.w[t]
         d = sum(
-                sum(pow(abs(w[key]*(x[key][j]-y[key][j])), 2) 
+                sum(
+                    pow(abs(w[key]*(x[key][j]-y[key][j])), 2) 
                 for j in range(min(len(x[key]), len(y[key]))))
             for key in w)
 
