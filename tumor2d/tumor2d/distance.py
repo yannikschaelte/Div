@@ -77,6 +77,26 @@ class ReweightedAdaptiveTumor2DDistance(AdaptiveTumor2DDistance):
                 self.w[t][key] /= 1000
 
 
+class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
+
+    def initialize(self, t, sample_from_prior, x_0):
+        self._update(t, sample_from_prior, x_0)
+
+    def update(self, t, all_sum_stats, x_0):
+        self._update(t, sample_from_prior, x_0)
+
+    def configure_sampler(self, sampler):
+        sampler.sample_factory.record_all_sum_stats = True
+
+    def get_config(self):
+        return {"name": self.__class__.__name__}
+
+    def __call__(self, t, x, y):
+        
+
+
+
+
 def normalize_sum_stats(x):
     x_flat = {}
     for key, value in x.items():
