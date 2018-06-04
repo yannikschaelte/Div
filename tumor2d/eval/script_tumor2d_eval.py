@@ -21,7 +21,7 @@ h_loaded_adap = pyabc.History("sqlite:////media/sf_shared/tumor2d_2.db")
 h_loaded_adap.id = 9
 
 h_loaded_prev = pyabc.History("sqlite:////media/sf_shared/tumor2d.db")
-h_loaded_prev.id = 1
+h_loaded_prev.id = 2
 
 h_loaded_prev1 = pyabc.History("sqlite:////media/sf_shared/tumor2d_1.db")
 h_loaded_prev1.id = 1
@@ -63,19 +63,22 @@ pops_dflt = h_loaded_dflt.get_all_populations()
 pops_prev = h_loaded_prev.get_all_populations()
 pops_prev1 = h_loaded_prev1.get_all_populations()
 pops_adap = h_loaded_adap.get_all_populations()
-    
+pops_prev_rew = h_loaded_prev_rew.get_all_populations()
+
 def samples():
     samples_dflt = pops_dflt['samples']
     samples_prev = pops_prev['samples']
     samples_prev1 = pops_prev1['samples']
     samples_adap = pops_adap['samples']
-    
+    samples_prev_rew = pops_prev_rew['samples']
+
     t = np.arange(0,40)
     fig = plt.figure()
     plt.plot(t[:30],samples_dflt.values[:30], 'mo-', label="dflt")
     plt.plot(t[:len(samples_prev.values)],samples_prev.values, 'bo-', label="prev")
     plt.plot(t[:len(samples_prev1.values)],samples_prev1.values, 'go-', label="prev1")
     plt.plot(t[:len(samples_adap.values)],samples_adap.values, 'ro-', label="adap")
+    plt.plot(t[:len(samples_prev_rew.values)],samples_prev_rew.values, 'yo-', label="prev-rew")
     plt.legend()
     fig.savefig("samples")
     plt.close()
@@ -87,6 +90,7 @@ def epsilon():
     eps_prev = pops_prev['epsilon']
     eps_prev1 = pops_prev1['epsilon']
     eps_adap = pops_adap['epsilon']
+    eps_prev_rew = pops_prev_rew['epsilon']
 
     t = np.arange(0,40)
     fig = plt.figure()
@@ -94,10 +98,11 @@ def epsilon():
     plt.plot(t[:len(eps_prev.values)],np.log(eps_prev.values), 'bo-', label="prev")
     plt.plot(t[:len(eps_prev1.values)],np.log(eps_prev1.values), 'go-', label="prev1")
     plt.plot(t[:len(eps_adap.values)],np.log(eps_adap.values), 'ro-', label="adap")
+    plt.plot(t[:len(eps_prev_rew.values)],np.log(eps_prev_rew.values), 'ro-', label="prev-rew")
     plt.legend()
     fig.savefig("eps")
     plt.close()
 
-kde_plots("prev_rew")
-#samples()
-#epsilon()
+#kde_plots("prev_rew")
+samples()
+epsilon()
