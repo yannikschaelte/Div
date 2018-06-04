@@ -48,7 +48,7 @@ observation = data_mean
 
 distance = Tumor2DDistance(data_var)
 distance = AdaptiveTumor2DDistance()
-distance = LessWeightsAdaptiveTumor2DDistance()
+#distance = LessWeightsAdaptiveTumor2DDistance()
 
 # SAMPLER
 
@@ -58,7 +58,7 @@ sampler = SingleCoreSampler()
 # POPULATION STRATEGY
 
 # population_size = AdaptivePopulationSize(start_nr_particles=500)
-population_size = 5
+population_size = 3
 
 # TRANSITION STRATEGY
 transition = LocalTransition(k=2)

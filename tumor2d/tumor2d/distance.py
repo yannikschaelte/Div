@@ -93,32 +93,37 @@ class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
         self._update(t, sample_from_prior, x_0)
 
     def update(self, t, all_sum_stats, x_0):
-        self._update(t, sample_from_prior, x_0)
+        self._update(t, all_sum_stats, x_0)
 
     def _update(self, t, sample_from_prior, x_0):
-        scales = {}
-        scale_fun = pyabc.median_absolute_deviation
+        scale_fun = pyabc.distance_functions.median_absolute_deviation
         n = len(sample_from_prior)
         w = {}
         for key in sample_from_prior[0]:
+            scales = []
             max_len = max(len(sample_from_prior[j][key]) for j in range(n))
             for j in range(max_len):
                 current_list = []
                 for ss in sample_from_prior:
                     if len(ss[key]) > j:
                         current_list.append(ss[key][j])
-                scale = scale_fun(current_list)
-                scales.setdefault(key, []).append(scale)
+                scale = scale_fun(data=current_list)
+                scales.append(scale)
             scale = np.mean(scales)
             if np.isclose(scale, 0):
                 w[key] = 0
             else:
                 w[key] = 1 / scale
+
+        # normalize weights
         mean_weight = np.mean(list(w.values()))
         for key in w:
             w[key] /= mean_weight
-
+        
+        # record
         self.w[t] = w
+
+        # log
         df_logger.debug("update distance weights = {}".format(self.w[t]))
 
     def configure_sampler(self, sampler):
