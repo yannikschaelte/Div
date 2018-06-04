@@ -98,7 +98,7 @@ def epsilon():
     plt.plot(t[:len(eps_prev.values)],np.log(eps_prev.values), 'bo-', label="prev")
     plt.plot(t[:len(eps_prev1.values)],np.log(eps_prev1.values), 'go-', label="prev1")
     plt.plot(t[:len(eps_adap.values)],np.log(eps_adap.values), 'ro-', label="adap")
-    plt.plot(t[:len(eps_prev_rew.values)],np.log(eps_prev_rew.values), 'ro-', label="prev-rew")
+    plt.plot(t[:len(eps_prev_rew.values)],np.log(eps_prev_rew.values), 'yo-', label="prev-rew")
     plt.legend()
     fig.savefig("eps")
     plt.close()
