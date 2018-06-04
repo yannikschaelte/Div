@@ -4,7 +4,7 @@ import pyabc
 from pyabc import Distribution, RV, ABCSMC, LocalTransition, MultivariateNormalTransition
 from pyabc.sampler import *
 from pyabc.populationstrategy import *
-from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance, ReweightedAdaptiveTumor2DDistance
+from tumor2d import simulate, log_model, load_default, Tumor2DDistance, AdaptiveTumor2DDistance, LessWeightsAdaptiveTumor2DDistance
 #import logging
 
 #df_logger = logging.getLogger('DistanceFunction')
@@ -55,7 +55,8 @@ observation = data_mean
 # DISTANCE
 
 #distance = Tumor2DDistance(data_var)
-distance = ReweightedAdaptiveTumor2DDistance()
+distance = AdaptiveTumor2DDistance()
+distance = LessWeightsAdaptiveTumor2DDistance()
 
 # SAMPLER
 
@@ -84,7 +85,7 @@ abc = ABCSMC(models=model,
              sampler=sampler,
              acceptor=acceptor)
 
-db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_adap_reweighted.db'
+db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_lessweights.db'
 
 abc.new(db=db_file, observed_sum_stat=observation)
 
