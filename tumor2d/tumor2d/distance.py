@@ -42,10 +42,12 @@ class ReweightedTumor2DDistance(Tumor2DDistance):
 class AdaptiveTumor2DDistance(pyabc.AdaptivePNormDistance):
     
 
-    def __init__(self, adaptive=True):
+    def __init__(self, 
+                 adaptive=True, 
+                 scale_function=pyabc.distance_functions.median_absolute_deviation):
         super().__init__(p=2, 
                          adaptive=adaptive,
-                         scale_function=pyabc.distance_functions.median_absolute_deviation)
+                         scale_function=scale_function)
     
     def initialize(self, t, sample_from_prior, x_0):
         sum_stats = []
@@ -141,6 +143,7 @@ class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
             for key in w)
 
         return d
+
 
 def normalize_sum_stats(x):
     x_flat = {}
