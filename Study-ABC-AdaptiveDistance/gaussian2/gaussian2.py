@@ -15,18 +15,19 @@ df_logger.setLevel(logging.DEBUG)
 
 # model definition
 def model(p):
-    return {'s1': p['theta'] + 1 + 0.1*sp.randn(),
-            's2': 2 + 0.001*sp.randn()}
+    return {'s0': p['th0'] + 1 + 0.1*sp.randn(),
+            's1': p['th1'] + 2 + 2*sp.randn()}
 
 
 # true model parameter
-theta_true = 3
+th_true = {'th0': 2, 'th1': 5}
 
 # observed summary statistics
-observation = {'s1': theta_true + 1, 's2': 2}
+observation = {'s0': th_true['th0'] + 1, 's1': th_true['th1'] + 2}
 
 # prior distribution
-prior = pyabc.Distribution(theta=pyabc.RV('uniform', 0, 10))
+prior = pyabc.Distribution(th0=pyabc.RV('uniform', 0, 10),
+                           th1=pyabc.RV('uniform', 0, 10))
 
 # further variables
 max_nr_populations = 10
@@ -37,11 +38,9 @@ def visualize(label, history):
     fig, ax = plt.subplots()
     t = history.max_t
     df, w = history.get_distribution(m=0, t=t)
-    pyabc.visualization.plot_kde_1d(df, w, xmin=0, xmax=10,
-                                    x='theta', ax=ax, 
-                                    refval = {'theta': theta_true},
-                                    label="PDF t={}".format(t))
-    plt.savefig("plt_kde_1d_" + label + "_" + str(t))
+    pyabc.visualization.plot_kde_matrix(df, w, limits={key: (0, 10) for key in ['th0', 'th1']}, 
+                                    refval = th_true)
+    plt.savefig("plt_kde_matrix_" + label + "_" + str(t))
 
     samples = history.get_all_populations()['samples']
     fig = plt.figure()

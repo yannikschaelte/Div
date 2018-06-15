@@ -16,14 +16,14 @@ df_logger.setLevel(logging.DEBUG)
 # model definition
 def model(p):
     return {'s1': p['theta'] + 1 + 0.1*sp.randn(),
-            's2': 2 + 0.001*sp.randn()}
+            's2': 2 + 2*sp.randn()}
 
 
 # true model parameter
 theta_true = 3
 
 # observed summary statistics
-observation = {'s1': theta_true + 1, 's2': 2}
+observation = {'s1': theta_true + 1, 's2': 8}
 
 # prior distribution
 prior = pyabc.Distribution(theta=pyabc.RV('uniform', 0, 10))
