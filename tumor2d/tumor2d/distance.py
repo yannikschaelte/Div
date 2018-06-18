@@ -44,7 +44,7 @@ class AdaptiveTumor2DDistance(pyabc.AdaptivePNormDistance):
 
     def __init__(self, 
                  adaptive=True, 
-                 scale_function=pyabc.distance_functions.median_absolute_deviation):
+                 scale_function=pyabc.distance_functions.combined_mean_absolute_deviation):
         super().__init__(p=2, 
                          adaptive=adaptive,
                          scale_function=scale_function)
