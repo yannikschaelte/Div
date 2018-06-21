@@ -83,7 +83,7 @@ abc = ABCSMC(models=model,
              sampler=sampler,
              acceptor=acceptor)
 
-db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_adap.db'
+db_file = 'sqlite:////home/icb/yannik.schaelte/Div/tumor2d/tumor2d_adap_cmad.db'
 
 abc.new(db=db_file, observed_sum_stat=observation)
 
