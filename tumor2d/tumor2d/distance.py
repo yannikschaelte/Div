@@ -145,6 +145,9 @@ class LessWeightsAdaptiveTumor2DDistance(pyabc.DistanceFunction):
         return d
 
 
+class LessWeightsAdaptiveTumor2DDistance2(pyabc.DistanceFunction):
+
+
 def normalize_sum_stats(x):
     x_flat = {}
     for key, value in x.items():
