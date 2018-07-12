@@ -3,7 +3,7 @@ addpath('../testmodels/rafmekerk');
 rng('default');
 rng(0);
 
-totalMaxFunEvals = 1000;
+totalMaxFunEvals = 10000;
 nStarts = 10;
 maxFunEvals = round( totalMaxFunEvals / nStarts );
 
@@ -19,11 +19,11 @@ nPar = parameters.number;
 
 options = PestoOptions();
 options.obj_type = 'log-posterior';
-options.proposal = 'ss latin hypercube';
+options.proposal = 'latin hypercube';
 options.n_starts = nStarts;
 % parallelized duration * 2
-% options.ss_maxFunEvals = 0;
-options.ss_maxFunEvals = max([2 * nStarts, min([nStarts * 10, totalMaxFunEvals / nStarts])]);
+options.ss_maxFunEvals = 0;
+% options.ss_maxFunEvals = max([2 * nStarts, min([nStarts * 50, totalMaxFunEvals / nStarts])]);
 disp(['ss_maxFunEvals: ' num2str(options.ss_maxFunEvals)]);
 options.objOutNumber = 2;
 options.mode = 'text';
