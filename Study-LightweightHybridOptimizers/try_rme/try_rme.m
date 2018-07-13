@@ -1,4 +1,4 @@
-addpath('../testmodels/rafmekerk');
+addpath('../../testmodels/rafmekerk');
 
 rng('default');
 rng(0);
@@ -42,4 +42,4 @@ parameters_res = getMultiStarts(parameters, objfun, options);
 time = toc(starttime);
 parameters_res.time = time;
 
-save(['test_rme_' options.proposal '_' num2str(maxFunEvals) '_' num2str(nStarts)], 'parameters_res');
+save(['try_rme_' options.proposal '_' num2str(maxFunEvals) '_' num2str(nStarts)], 'parameters_res');
