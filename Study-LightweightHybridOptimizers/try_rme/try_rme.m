@@ -13,17 +13,19 @@ load data_rafmekerk_noreps.mat
 objfun = @(x) llh_rafmekerk_standard(x, D);
 
 [parameters, ~] = getParametersAndOptions_rafmekerk('standard');
+parameters.guess = [];
 lb = parameters.min;
 ub = parameters.max;
 nPar = parameters.number;
 
 options = PestoOptions();
 options.obj_type = 'log-posterior';
-options.proposal = 'latin hypercube';
+% options.proposal = 'latin hypercube';
+options.proposal = 'ss latinHypercube separatedLHParametersSimple';
 options.n_starts = nStarts;
 % parallelized duration * 2
-options.ss_maxFunEvals = 0;
-% options.ss_maxFunEvals = max([2 * nStarts, min([nStarts * 50, totalMaxFunEvals / nStarts])]);
+% options.ss_maxFunEvals = 0;
+options.ss_maxFunEvals = max([2 * nStarts, min([nStarts * 10, totalMaxFunEvals / nStarts])]);
 disp(['ss_maxFunEvals: ' num2str(options.ss_maxFunEvals)]);
 options.objOutNumber = 2;
 options.mode = 'text';
