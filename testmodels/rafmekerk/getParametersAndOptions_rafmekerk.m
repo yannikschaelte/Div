@@ -20,8 +20,8 @@ nPar = 28; % maximum number of parameters
 minPar = -7*ones(nPar,1);
 maxPar = 5*ones(nPar,1);
 
-rng(0);
-par0 = bsxfun(@plus,minPar,bsxfun(@times,maxPar - minPar, lhsdesign(nStarts,nPar,'smooth','off')'));
+% rng(0);
+% par0 = bsxfun(@plus,minPar,bsxfun(@times,maxPar - minPar, lhsdesign(nStarts,nPar,'smooth','off')'));
 
 switch approach
     case 'standard'
@@ -63,6 +63,6 @@ end
 parameters.number = nPar;
 parameters.min = minPar(1:nPar,1);
 parameters.max = maxPar(1:nPar,1);
-parameters.guess = par0(1:nPar,1:nStarts);
+% parameters.guess = par0(1:nPar,1:nStarts);
 
 end
