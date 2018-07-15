@@ -21,7 +21,7 @@ nPar = parameters.number;
 options = PestoOptions();
 options.obj_type = 'log-posterior';
 % options.proposal = 'latin hypercube';
-options.proposal = 'ss latinHypercube separatedLHParametersSimple';
+options.proposal = 'ss latinHypercube separatedLHParameters';
 options.n_starts = nStarts;
 % parallelized duration * 2
 % options.ss_maxFunEvals = 0;
