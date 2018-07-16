@@ -8,7 +8,7 @@ objfuns_sslh = zeros(1, nExp);
 time_lh = zeros(1, nExp);
 time_sslh = zeros(1, nExp);
 
-for j = 1:50
+for j = 1:nExp
    load(['res/test_rme_latin-hypercube_' num2str(j-1) '_1000_10.mat']);
    res_lh(:, j) = parameters_res.MS.logPost(:);
    objfuns_lh(1, j) = nansum(parameters_res.MS.n_objfun) / nStarts;
@@ -26,9 +26,9 @@ end
 [best_res_sslh, index_sslh] = sort(res_sslh(1, :),'descend');
 
 figure;
-plot(1:nExp, best_res_lh, 'r*-');
+plot(1:nExp, best_res_lh, 'b*-');
 hold on;
-plot(1:nExp, best_res_sslh, 'b*-');
+plot(1:nExp, best_res_sslh, 'r*-');
 title('Best found function value');
 legend('old', 'new', 'location', 'SouthWest');
 print('res/best.png');
@@ -41,9 +41,9 @@ objfuns_lh = sort(objfuns_lh, 'descend');
 objfuns_sslh = sort(objfuns_sslh, 'descend');
 
 figure;
-plot(1:nExp, objfuns_lh, 'r*-');
+plot(1:nExp, objfuns_lh, 'b*-');
 hold on;
-plot(1:nExp, objfuns_sslh, 'b*-');
+plot(1:nExp, objfuns_sslh, 'r*-');
 title('Number of function evaluations');
 legend('old', 'new');
 print('res/fevals.png');
@@ -54,9 +54,19 @@ time_lh = sort(time_lh, 'descend');
 time_sslh = sort(time_sslh, 'descend');
 
 figure;
-plot(1:nExp, time_lh , 'r*-');
+plot(1:nExp, time_lh , 'b*-');
 hold on;
-plot(1:nExp, time_sslh, 'b*-');
+plot(1:nExp, time_sslh, 'r*-');
 title('Overall time');
 legend('old', 'new');
 print('res/time.png');
+
+% plot all multistart results
+
+figure;
+hold on;
+for j = 1:nExp
+    plot(1:nStarts, -log(-res_lh(:, j)), 'b*-');
+    plot(1:nStarts, -log(-res_sslh(:, j)), 'r*-');
+end
+print('res/allstarts.png');
