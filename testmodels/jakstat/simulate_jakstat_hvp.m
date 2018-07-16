@@ -1,7 +1,7 @@
 % simulate_jakstat_hvp.m is the matlab interface to the cvodes mex
 %   which simulates the ordinary differential equation and respective
 %   sensitivities according to user specifications.
-%   this routine was generated using AMICI commit fcf443dcf60b45c9d366e39f1df1aedeb09359b0 in branch master in repo https://github.com/icb-dcm/amici.
+%   this routine was generated using AMICI commit # in branch unknown branch in repo unknown repository.
 %
 % USAGE:
 % ======
@@ -58,7 +58,6 @@
 %    .stldet   ... flag for stability limit detection. this should be turned on for stiff problems.
 %        0: OFF
 %        1: ON (DEFAULT)
-%    .qPositiveX   ... vector of 0 or 1 of same dimension as state vector. 1 enforces positivity of states.
 %    .sensi_meth   ... method for sensitivity analysis.
 %        'forward': forward sensitivity analysis (DEFAULT)
 %        'adjoint': adjoint sensitivity analysis 
@@ -128,12 +127,6 @@ if(isempty(options_ami.sens_ind))
     options_ami.sens_ind = 1:17;
 end
 
-if(~isempty(options_ami.pbar))
-    pbar = options_ami.pbar;
-else
-    pbar = ones(size(theta));
-end
-
 if(isempty(options_ami.pscale))
     options_ami.pscale = 'log10' ;
 end
@@ -173,15 +166,6 @@ if(options_ami.sensi > 1)
     nxfull = 18;
 else
     nxfull = 9;
-end
-if(isempty(options_ami.qpositivex))
-    options_ami.qpositivex = zeros(nxfull,1);
-else
-    if(numel(options_ami.qpositivex)>=nxfull)
-        options_ami.qpositivex = options_ami.qpositivex(:);
-    else
-        error(['Number of elements in options_ami.qpositivex does not match number of states ' num2str(nxfull) ]);
-    end
 end
 plist = options_ami.sens_ind-1;
 if(nargin>=4)
@@ -226,26 +210,26 @@ end
 init = struct();
 if(~isempty(options_ami.x0))
     if(size(options_ami.x0,2)~=1)
-        error('x0 field must be a row vector!');
+        error('x0 field must be a column vector!');
     end
     if(size(options_ami.x0,1)~=nxfull)
-        error('Number of columns in x0 field does not agree with number of states!');
+        error('Number of rows in x0 field does not agree with number of states!');
     end
     init.x0 = options_ami.x0;
 end
 if(~isempty(options_ami.sx0))
     if(size(options_ami.sx0,2)~=nplist)
-        error('Number of rows in sx0 field does not agree with number of model parameters!');
+        error('Number of columns in sx0 field does not agree with number of model parameters!');
     end
     if(size(options_ami.sx0,1)~=nxfull)
-        error('Number of columns in sx0 field does not agree with number of states!');
+        error('Number of rows in sx0 field does not agree with number of states!');
     end
     init.sx0 = bsxfun(@times,options_ami.sx0,1./permute(chainRuleFactor(:),[2,1]));
 end
 if(options_ami.sensi<2)
-    sol = ami_jakstat_hvp(tout,theta(1:17),kappa(1:2),options_ami,plist,pbar(plist+1),xscale,init,data);
+    sol = ami_jakstat_hvp(tout,theta(1:17),kappa(1:2),options_ami,plist,xscale,init,data);
 else
-    sol = ami_jakstat_hvp_o2vec(tout,theta(1:17),kappa(1:19),options_ami,plist,pbar(plist+1),xscale,init,data);
+    sol = ami_jakstat_hvp_o2vec(tout,theta(1:17),kappa(1:19),options_ami,plist,xscale,init,data);
 end
 if(options_ami.sensi == 2)
     if(~(options_ami.sensi_meth==2))
