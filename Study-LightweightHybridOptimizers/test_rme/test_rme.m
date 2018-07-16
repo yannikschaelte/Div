@@ -20,7 +20,7 @@ parameters.guess = [];
 if strcmp(startpoint_method, 'latin hypercube')
     ss_maxFunEvals = 0;
 else
-    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 10, round(totalMaxFunEvals / nStarts)])]);
+    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 50, round(totalMaxFunEvals / nStarts)])]);
 end    
 
 options = PestoOptions();
