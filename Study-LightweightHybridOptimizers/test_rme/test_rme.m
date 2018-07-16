@@ -47,6 +47,6 @@ parameters_res = getMultiStarts(parameters, objfun, options);
 time = toc(starttime);
 parameters_res.time = time;
 
-save(['test_rme_' strrep(startpoint_method, ' ', '-') '_' num2str(random_index) '_' num2str(maxFunEvals) '_' num2str(nStarts)]);
+save(['res/test_rme_' strrep(startpoint_method, ' ', '-') '_' num2str(random_index) '_' num2str(maxFunEvals) '_' num2str(nStarts)]);
 
 end
