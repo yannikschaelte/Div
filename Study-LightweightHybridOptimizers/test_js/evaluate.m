@@ -1,5 +1,5 @@
 nExp = 50;
-nStarts = 10;
+nStarts = 5;
 
 nAlgs = 3;
 
@@ -23,7 +23,7 @@ labels{3} = 'ss clustered';
 
 for j = 1:nExp
     for k = 1:nAlgs
-        load(['res/test_rme_' basefile{k} '_' num2str(j-1) '_1000_10.mat']);
+        load(['res/test_js_' basefile{k} '_' num2str(j-1) '_500_5.mat']);
         res{k}(:, j) = parameters_res.MS.logPost(:);
         objfuns{k}(1, j) = nansum(parameters_res.MS.n_objfun) / nStarts;
         times{k}(1, j) = nansum(parameters_res.MS.t_cpu);
