@@ -1,3 +1,6 @@
+clear all;
+close all;
+
 nExp = 50;
 nStarts = 10;
 
