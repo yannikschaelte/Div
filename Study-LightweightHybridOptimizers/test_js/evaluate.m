@@ -1,3 +1,6 @@
+clear all;
+close all;
+
 nExp = 50;
 nStarts = 5;
 
@@ -84,7 +87,7 @@ figure;
 hold on;
 for j = 1:nExp
     for k = 1:nAlgs
-        plot(1:nStarts, -log(-res{k}(:, j)), [colors{k} '*-']);
+        plot(1:nStarts, res{k}(:, j), [colors{k} '*-']);
     end
 end
 print('res/allstarts.png');

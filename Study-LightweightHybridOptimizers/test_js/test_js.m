@@ -5,12 +5,12 @@ addpath('../../testmodels/jakstat');
 rng('default');
 rng(random_index);
 
-totalMaxFunEvals = 2500;
-nStarts = 5; % 5 * 500
+totalMaxFunEvals = 1600;
+nStarts = 4; % 5 * 500
 maxFunEvals = round( totalMaxFunEvals / nStarts );
 
 solver = 'fmincon';
-
+ 
 load('data_jakstat.mat', 'D');
 objfun = @(x) nllh_jakstat(x, D);
 
@@ -20,7 +20,7 @@ parameters.guess = [];
 if strcmp(startpoint_method, 'latin hypercube')
     ss_maxFunEvals = 0;
 else
-    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 10, round(totalMaxFunEvals / nStarts)])]);
+    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 20, round(totalMaxFunEvals / nStarts)])]);
 end    
 
 options = PestoOptions();
