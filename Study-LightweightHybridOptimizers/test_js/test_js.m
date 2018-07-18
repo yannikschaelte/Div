@@ -5,8 +5,8 @@ addpath('../../testmodels/jakstat');
 rng('default');
 rng(random_index);
 
-totalMaxFunEvals = 1600;
-nStarts = 4; % 5 * 500
+totalMaxFunEvals = 1000;
+nStarts = 3; % 5 * 500
 maxFunEvals = round( totalMaxFunEvals / nStarts );
 
 solver = 'fmincon';
