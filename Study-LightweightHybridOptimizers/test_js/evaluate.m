@@ -10,7 +10,7 @@ nAlgs = 3;
 % benchmark collection caro, elba
 % benchmarks sind verfügbar über d2d online, paper, 20 modelle
 % dirichlet approximation of posterior
-% unser kde in hohen dim zu smooth, um vtlg vernünftig zu approximiern
+% unser kde in hohen dim zu smooth, um vtlg vernünftig zu approximieren
 
 for k = 1:nAlgs
     res{k} = zeros(nStarts, nExp);
