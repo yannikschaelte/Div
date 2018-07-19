@@ -42,6 +42,7 @@ options.localOptimizerOptions = lOptions;
 disp(['ss_maxFunEvals: ' num2str(options.ss_maxFunEvals)]);
 disp(['local maxFunEvals: ' num2str(lOptions.MaxFunctionEvaluations)]);
 
+% save whole time taken (including startpoint selection)
 starttime = tic;
 parameters_res = getMultiStarts(parameters, objfun, options);
 time = toc(starttime);
