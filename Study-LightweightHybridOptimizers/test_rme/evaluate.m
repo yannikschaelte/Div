@@ -29,7 +29,7 @@ for j = 1:nExp
         load(['res/test_rme_' basefile{k} '_' num2str(j-1) '_1000_10.mat']);
         res{k}(:, j) = parameters_res.MS.logPost(:);
         objfuns{k}(1, j) = nansum(parameters_res.MS.n_objfun) / nStarts;
-        times{k}(1, j) = nansum(parameters_res.MS.t_cpu);
+        times{k}(1, j) = parameters_res.time;
     end
 end
 

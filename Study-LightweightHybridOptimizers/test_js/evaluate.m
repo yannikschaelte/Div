@@ -41,7 +41,7 @@ for jGlobal = 1:3
             load(['res/test_js_' basefile{k} '_' num2str(j-1) '_' num2str(stg(2)) '_' num2str(stg(1)) '.mat']);
             res{k}(:, j) = parameters_res.MS.logPost(:);
             objfuns{k}(1, j) = nansum(parameters_res.MS.n_objfun) / nStarts;
-            times{k}(1, j) = nansum(parameters_res.MS.t_cpu);
+            times{k}(1, j) = parameters_res.time;
         end
     end
     
