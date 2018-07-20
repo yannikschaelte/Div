@@ -5,8 +5,8 @@ addpath('../../testmodels/rafmekerk');
 rng('default');
 rng(random_index);
 
-totalMaxFunEvals = 10000;
-nStarts = 10;
+totalMaxFunEvals = 2000; % 10000;
+nStarts = 2; % 10;
 maxFunEvals = round( totalMaxFunEvals / nStarts );
 
 solver = 'fmincon';
@@ -20,8 +20,9 @@ parameters.guess = [];
 if strcmp(startpoint_method, 'latin hypercube')
     ss_maxFunEvals = 0;
 else
-    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 50, round(totalMaxFunEvals / nStarts)])]);
-end    
+    ss_maxFunEvals = max([2 * nStarts, min([nStarts * 100, round(totalMaxFunEvals / nStarts)])]); 
+%     ss_maxFunEvals = max([2 * nStarts, min([nStarts * 50, round(totalMaxFunEvals / nStarts)])]);
+end
 
 options = PestoOptions();
 options.obj_type = 'log-posterior';
