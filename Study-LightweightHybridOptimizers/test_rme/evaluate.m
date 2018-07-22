@@ -53,7 +53,7 @@ for jGlobal = 1:2
     end
     title('Best found function value');
     legend('location', 'SouthWest');
-    print(['res/best_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
+    saveas(gcf, ['res/best_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
 
     % number of function evaluations
 
@@ -70,7 +70,7 @@ for jGlobal = 1:2
     end
     title('Number of function evaluations');
     legend;
-    print(['res/fevals_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
+    saveas(gcf, ['res/fevals_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
     % overall time (approach 2 + few seconds)
 
@@ -85,7 +85,7 @@ for jGlobal = 1:2
     end
     title('Overall time');
     legend;
-    print(['res/time_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
+    saveas(gcf, ['res/time_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
     % plot all multistart results
 
@@ -96,6 +96,6 @@ for jGlobal = 1:2
             plot(1:nStarts, -log(-res{k}(:, j)), [colors{k} '*-']);
         end
     end
-    print(['res/allstarts_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
+    saveas(gcf, ['res/allstarts_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
 end
