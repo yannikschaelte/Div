@@ -52,7 +52,9 @@ def kde_plots(name):
 
     for t in range(h_loaded.max_t+1):
         df, w = h_loaded.get_distribution(m=0, t=t)
-        plot_kde_matrix(df, w, limits=limits)
+        grid = plot_kde_matrix(df, w, limits=limits, refval=tumor2d.default_pams)
+        plt.subplots_adjust(top=0.95)
+        grid.fig.suptitle("Population t=" + str(t), fontsize=30)
         plt.savefig(name + '_' + str(t))
         plt.close()
         print("done with " + name + "_" + str(t))
@@ -103,6 +105,6 @@ def epsilon():
     fig.savefig("eps")
     plt.close()
 
-#kde_plots("prev_rew")
-samples()
-epsilon()
+kde_plots("dflt")
+#samples()
+#epsilon()

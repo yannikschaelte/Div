@@ -37,13 +37,13 @@ def log_model(x):
     
 distance = Tumor2DDistance(load_default()[2])
 
-default_pams = dict(division_rate=4.17e-2,
-                    initial_spheroid_radius=1.2e1,
-                    initial_quiescent_cell_fraction=7.5e-1,
-                    division_depth=100,
-                    ecm_production_rate=5e-3,
-                    ecm_degradation_rate=8e-4,
-                    ecm_division_threshold=1e-2)
+default_pams = dict(log_division_rate=np.log10(4.17e-2),
+                    log_initial_spheroid_radius=np.log10(1.2e1),
+                    log_initial_quiescent_cell_fraction=np.log10(7.5e-1),
+                    log_division_depth=np.log10(100),
+                    log_ecm_production_rate=np.log10(5e-3),
+                    log_ecm_degradation_rate=np.log10(8e-4),
+                    log_ecm_division_threshold=np.log10(1e-2))
 
 
 def animated_gif(db, output):

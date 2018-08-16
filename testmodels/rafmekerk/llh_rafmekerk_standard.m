@@ -1,4 +1,4 @@
-function [varargout] = nllh_rafmekerk_standard(theta, D)
+function [varargout] = llh_rafmekerk_standard(theta, D)
 
     
     %% Objective Function Evaluation
