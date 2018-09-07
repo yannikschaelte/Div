@@ -1,0 +1,22 @@
+observable	condition	conditionRef	scalingParameter	time	measurement	sigma
+Naive_obs	model1_data1			4	459.0	290.0
+Naive_obs	model1_data1			6	74.0	64.0
+EarlyEffector_obs	model1_data1			4	386.0	266.0
+EarlyEffector_obs	model1_data1			6	1172.0	526.0
+EarlyEffector_obs	model1_data1			7	47470.0	23855.0
+EarlyEffector_obs	model1_data1			8	175825.0	19722.0
+EarlyEffector_obs	model1_data1			13	4911.0	3048.0
+EarlyEffector_obs	model1_data1			15	7417.0	2924.0
+EarlyEffector_obs	model1_data1			22	3359.0	1540.0
+LateEffector_obs	model1_data1			6	888.0	182.0
+LateEffector_obs	model1_data1			7	4577.0	1976.0
+LateEffector_obs	model1_data1			8	32860.0	4105.0
+LateEffector_obs	model1_data1			13	46727.0	23601.0
+LateEffector_obs	model1_data1			15	27586.0	6841.0
+LateEffector_obs	model1_data1			22	13650.0	7266.0
+LateEffector_obs	model1_data1			28	3936.0	2705.0
+Memory_obs	model1_data1			8	289.0	80.0
+Memory_obs	model1_data1			13	9564.0	4206.0
+Memory_obs	model1_data1			15	15631.0	5745.0
+Memory_obs	model1_data1			22	41744.0	15987.0
+Memory_obs	model1_data1			28	32705.0	7909.0
