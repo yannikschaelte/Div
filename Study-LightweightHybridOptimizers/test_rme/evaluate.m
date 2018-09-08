@@ -51,7 +51,9 @@ for jGlobal = 1:2
     for k = 1:nAlgs
         plot(1:nExp, best_res{k}, [colors{k} '*-'], 'DisplayName', labels{k});
     end
-    title('Best found function value');
+    title(['Best found function value, ' num2str(stg(1)) ' runs, ' num2str(stg(1)*stg(2)) ' budget']);
+    xlabel('multi-start run');
+    ylabel('log-likelihood');
     legend('location', 'SouthWest');
     saveas(gcf, ['res/best_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
 
@@ -69,6 +71,8 @@ for jGlobal = 1:2
         plot(1:nExp, objfuns{k}, [colors{k} '*-'], 'DisplayName', labels{k});
     end
     title('Number of function evaluations');
+    xlabel('multi-start run');
+    ylabel('# function evaluations');
     legend;
     saveas(gcf, ['res/fevals_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
@@ -84,6 +88,8 @@ for jGlobal = 1:2
         plot(1:nExp, times{k}, [colors{k} '*-'], 'DisplayName', labels{k});
     end
     title('Overall time');
+    xlabel('multi-start run');
+    ylabel('time');
     legend;
     saveas(gcf, ['res/time_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
@@ -96,6 +102,9 @@ for jGlobal = 1:2
             plot(1:nStarts, -log(-res{k}(:, j)), [colors{k} '*-']);
         end
     end
+    title('All starts of all multi-start runs');
+    xlabel('multi-start run');
+    ylabel('log-likelihood');
     saveas(gcf, ['res/allstarts_' num2str(stg(2)) '_' num2str(stg(1)) '.png']);
     
 end
