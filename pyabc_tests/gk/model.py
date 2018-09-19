@@ -109,6 +109,10 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', prior_lb, prior_ub)
 # distance
 distance = pyabc.AdaptivePNormDistance()
 
+# sampler
+sampler = pyabc.MulticoreEvalParallelSampler(n_procs=6)
+
+# visualize
 
 def visualize(label, history):
     t = history.max_t
