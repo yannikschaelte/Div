@@ -123,5 +123,5 @@ def visualize(label, history):
                     for key in p_true},
             refval=p_true)
     plt.suptitle("Posterior KDE plot")
-    plt.savefig(label + "_kde_matrix_" + str(t) + ".svg", format='svg')
+    plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
     plt.close()
