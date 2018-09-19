@@ -106,11 +106,11 @@ prior_ub = 5
 prior = pyabc.Distribution(**{key: pyabc.RV('uniform', prior_lb, prior_ub)
                               for key in p_true})
 
-# distance
+# pyabc stuff
 distance = pyabc.AdaptivePNormDistance()
-
-# sampler
-sampler = pyabc.MulticoreEvalParallelSampler(n_procs=6)
+sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
+max_nr_populations = 10
+pop_size = 100
 
 # visualize
 
@@ -121,7 +121,7 @@ def visualize(label, history):
             df, w,
             limits={key: (prior_lb, prior_ub)
                     for key in p_true},
-            reval=p_true)
+            refval=p_true)
     plt.suptitle("Posterior KDE plot")
     plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
     plt.close()
