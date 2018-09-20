@@ -11,7 +11,7 @@ import os
 # noise
 std = 1
 # number of replicates
-n_r = 1000
+n_r = 100
 
 
 def model(th):
@@ -54,7 +54,7 @@ def pdf_true(m):
 # pyabc stuff
 distance = pyabc.PNormDistance(p=2)
 sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
-max_nr_populations = 1
+max_nr_populations = 10
 pop_size = 500
 
 # visualize
@@ -63,6 +63,6 @@ def visualize(label, history, show_true=True):
     t = history.max_t
     df, w = history.get_distribution(m=0, t=t)
     ax = pyabc.visualization.plot_kde_1d(df, w, xmin=prior_lb, xmax=prior_ub,
-        x='m')
+        x='m', refval=th_true)
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
