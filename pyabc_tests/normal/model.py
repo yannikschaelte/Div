@@ -11,7 +11,7 @@ import os
 # noise
 std = 1
 # number of replicates
-n_r = 100
+n_r = 10000
 
 
 def model(th):
@@ -63,6 +63,6 @@ def visualize(label, history, show_true=True):
     t = history.max_t
     df, w = history.get_distribution(m=0, t=t)
     ax = pyabc.visualization.plot_kde_1d(df, w, xmin=prior_lb, xmax=prior_ub,
-        x='m', refval=th_true)
+        x='m', numx=200, refval=th_true)
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
