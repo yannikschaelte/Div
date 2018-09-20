@@ -1,5 +1,6 @@
 import numpy as np
 import scipy as sp
+import scipy.integrate as integrate
 import pickle
 import pyabc
 import pyabc.visualization
@@ -41,11 +42,15 @@ prior = pyabc.Distribution(
 
 # true pdf
 
-def pdf_true(m):
-    prior_val = prior.pdf(m)
+def pdf_true(x):
+    def uniform_dty(x):
+        if x > prior_ub or x < prior_lb:
+            return 0
+        return 1 / (prior_ub - prior_lb)
+    prior_val = uniform_dty(x)
+
     def normal_dty(m, m_true):
-        return (1 / np.sqrt(2 * np.pi * std**2)
-               * np.exp( - ((y_obs['m'] - y['m']) / noise) ** 2 / 2))
+        return np.exp( - (m - m_true) / (2 * noise**2 / n_r)
     likelihood_val = normal_dty(m, th_true['m'])
 
     return likelihood_val * prior_val
@@ -64,5 +69,19 @@ def visualize(label, history, show_true=True):
     df, w = history.get_distribution(m=0, t=t)
     ax = pyabc.visualization.plot_kde_1d(df, w, xmin=prior_lb, xmax=prior_ub,
         x='m', numx=200, refval=th_true)
+
+    if show_true:
+        integral = integrate.quad(pdf_true, prior_lb, prior_ub)[0]
+
+        def pdf(x):
+            return pdf_true(x) / integral
+
+        xs = np.linspace(prior_lb, prior_ub, 300)
+        ys = []
+        for x in xs:
+            ys.append(pdf(x))
+
+        ax.plot(x, y, '-', color='C2')
+
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
