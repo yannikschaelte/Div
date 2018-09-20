@@ -1,4 +1,4 @@
-import numpy
+import numpy as np
 import pyabc.visualization
 import os
 import tempfile
@@ -17,14 +17,14 @@ def gk(p):
     c = 0.8
 
     # sample from normal distribution
-    z = numpy.random.normal(0, 1)
+    z = np.random.normal(0, 1)
 
     # to sample from gk distribution
     return _z_to_gk(a, b, g, k, c, z)
 
 
 def _z_to_gk(a, b, g, k, c, z):
-    e = numpy.exp(-g*z)
+    e = np.exp(-g*z)
     return a + b * (1 + c * (1-e) / (1+e)) * (1 + z**2)**k * z
 
 
@@ -87,6 +87,11 @@ def get_y_obs():
         y_obs = pickle.load(open(y_file, 'rb'))
     except Exception:
         y_obs = model(p_true)
+        #y_obs_arr = []
+        #for _ in range(0, 1000):
+        #    y_obs_arr.append(model(p_true))
+        #y_obs_arr = np.array(y_obs_arr)
+        #y_obs = np.mean(y_obs_arr, axis=0)
         pickle.dump(y_obs, open(y_file, 'wb'))
     
     _y_obs = y_obs
@@ -110,7 +115,7 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', prior_lb, prior_ub)
 distance = pyabc.AdaptivePNormDistance()
 sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
 max_nr_populations = 10
-pop_size = 500
+pop_size = 100
 
 # visualize
 
