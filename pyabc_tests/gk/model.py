@@ -110,7 +110,7 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', prior_lb, prior_ub)
 distance = pyabc.AdaptivePNormDistance()
 sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
 max_nr_populations = 10
-pop_size = 100
+pop_size = 500
 
 # visualize
 
