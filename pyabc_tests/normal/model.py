@@ -12,7 +12,7 @@ import os
 # noise
 std = 1
 # number of replicates
-n_r = 10000
+n_r = 1000
 
 
 def model(th):
@@ -42,15 +42,15 @@ prior = pyabc.Distribution(
 
 # true pdf
 
-def pdf_true(x):
-    def uniform_dty(x):
-        if x > prior_ub or x < prior_lb:
+def pdf_true(m):
+    def uniform_dty(m):
+        if m > prior_ub or m < prior_lb:
             return 0
         return 1 / (prior_ub - prior_lb)
-    prior_val = uniform_dty(x)
+    prior_val = uniform_dty(m)
 
     def normal_dty(m, m_true):
-        return np.exp( - (m - m_true) / (2 * noise**2 / n_r)
+        return np.exp( - (m - m_true)**2 / (2 * std**2 / n_r ) )
     likelihood_val = normal_dty(m, th_true['m'])
 
     return likelihood_val * prior_val
@@ -72,16 +72,14 @@ def visualize(label, history, show_true=True):
 
     if show_true:
         integral = integrate.quad(pdf_true, prior_lb, prior_ub)[0]
-
         def pdf(x):
             return pdf_true(x) / integral
 
-        xs = np.linspace(prior_lb, prior_ub, 300)
+        xs = np.linspace(prior_lb, prior_ub, 10000)
         ys = []
         for x in xs:
             ys.append(pdf(x))
-
-        ax.plot(x, y, '-', color='C2')
+        ax.plot(xs, ys, '.', color='C2')
 
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
