@@ -33,8 +33,8 @@ y_obs = 2
 # sumstat
 sumstat_obs = sumstat(y_obs)
 # prior
-prior_lb = -10
-prior_ub = 10
+prior_lb = -5
+prior_ub = 5
 prior = pyabc.Distribution(
     **{'th0': pyabc.RV('uniform', prior_lb, prior_ub - prior_lb)})
 
@@ -48,8 +48,7 @@ def pdf_true(p):
     prior_val = uniform_dty(p)
 
     def normal_dty(y_obs, mean, std):
-        return ( np.exp( - (y_obs - mean)**2 / (2 * std**2) )
-                * 1 / (np.sqrt(2 * np.pi) * std) ) 
+        return np.exp( - (y_obs - mean)**2 / (2 * std**2) 
     likelihood_val = normal_dty(y_obs, mean(p), std(p))
 
     return likelihood_val * prior_val
@@ -57,8 +56,8 @@ def pdf_true(p):
 
 # pyabc stuff
 distance = pyabc.PNormDistance(p=1)
-sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
-max_nr_populations = 10
+sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=20)
+max_nr_populations = 20
 pop_size = 500
 
 # visualize
@@ -82,6 +81,9 @@ def visualize(label, history, show_true=True):
         ys = []
         for x in xs:
             ys.append(pdf(x))
+
+        integral2 = integrate.quad(pdf, prior_lb, prior_ub)[0]
+        print(integral, integral2)
         ax.plot(xs, ys, '-', color='0.75', label="True PDF")
     ax.legend()
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
