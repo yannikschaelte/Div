@@ -193,7 +193,7 @@ def visualize(label, history):
     df, w = history.get_distribution(m=0, t=t)
     ax = pyabc.visualization.plot_kde_matrix(
             df, w,
-            limits=list(limits.values()),
+            limits=limits,
             refval=p_true)
     plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
     plt.close()
