@@ -67,8 +67,19 @@ def model(p):
 
 
 def sumstat(y):
+    """
+    Assume only protein counts can be observed.
+    """
+    s = {}
+    mean_p = np.mean(y['xs'][:, :, 1], axis=0).flatten()
+    for j in range(0, n_timepoints):
+        s['mean' + str(j)] = mean_p[j]
 
-    s = y
+    if n_r > 1:
+        std_p = np.sqrt(np.var(y['xs'][:, :, 1], axis=0)).flatten()
+        for j in range(0, n_timepoints):
+            s['std' + str(j)] = std_p[j]
+
     return s
 
 
