@@ -194,6 +194,6 @@ def visualize(label, history):
     ax = pyabc.visualization.plot_kde_matrix(
             df, w,
             limits=list(limits.values()),
-            reval=p_true)
+            refval=p_true)
     plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
     plt.close()
