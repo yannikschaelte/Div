@@ -191,6 +191,7 @@ def visualize_y(y):
 def visualize(label, history):
     t = history.max_t
     df, w = history.get_distribution(m=0, t=t)
+    print("t=" + str(t))
     ax = pyabc.visualization.plot_kde_matrix(
             df, w,
             limits=limits,
