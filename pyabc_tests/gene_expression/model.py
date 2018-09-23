@@ -146,8 +146,8 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', bounds[0], bounds[1])
 
 # pyabc stuff
 distance = pyabc.AdaptivePNormDistance(p=2)
-sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=10)
-#sampler = pyabc.sampler.RedisEvalParallelSampler(host="wastl", port=8775)
+#sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=10)
+sampler = pyabc.sampler.RedisEvalParallelSampler(host="wastl", port=8775)
 max_nr_populations = 20
 pop_size = 100
 
