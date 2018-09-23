@@ -1,7 +1,7 @@
 from model import *
 import pyabc
 
-db_file= "sqlite:///db_" + str(n_r) + ".db"
+db_file= "sqlite:///db1_" + str(n_r) + ".db"
 
 abc = pyabc.ABCSMC(models=model,
                    parameter_priors=prior,
