@@ -12,7 +12,7 @@ import os
 # noise
 std = 1
 # number of replicates
-n_r = 1000
+n_r = 100
 
 
 def model(th):
@@ -79,7 +79,7 @@ def visualize(label, history, show_true=True):
         ys = []
         for x in xs:
             ys.append(pdf(x))
-        ax.plot(xs, ys, '.', color='C2')
+        ax.plot(xs, ys, '-', color='k', alpha=0.75)
 
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
