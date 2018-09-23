@@ -9,7 +9,8 @@ abc = pyabc.ABCSMC(models=model,
                    summary_statistics=sumstat,
                    population_size=pop_size,
                    sampler=sampler)
-abc.new(db=db_file, observed_sum_stat=sumstat_obs)
-h = abc.run(minimum_epsilon=0, max_nr_populations=max_nr_populations)
-
+#abc.new(db=db_file, observed_sum_stat=sumstat_obs)
+#h = abc.run(minimum_epsilon=0, max_nr_populations=max_nr_populations)
+h = pyabc.History(db_file)
+h.id = 1
 visualize("pic1", h)
