@@ -66,20 +66,33 @@ def model(p):
     return _for_timepoints(y_raw)
 
 
-def sumstat(y):
+def sumstat_p(y):
     """
     Assume only protein counts can be observed.
     """
     s = {}
     mean_p = np.mean(y['xs'][:, :, 1], axis=0).flatten()
     for j in range(0, n_timepoints):
-        s['mean' + str(j)] = mean_p[j]
-
+        s['mean_p_' + str(j)] = mean_p[j]
     if n_r > 1:
         std_p = np.sqrt(np.var(y['xs'][:, :, 1], axis=0)).flatten()
         for j in range(0, n_timepoints):
-            s['std' + str(j)] = std_p[j]
+            s['std_p_' + str(j)] = std_p[j]
+    return s
 
+
+def sumstat_mp(y):
+    """
+    Assume also mrna counts can be observed.
+    """
+    s = sumstat_p(y)
+    mean_m = np.mean(y['xs'][:, :, 0], axis=0).flatten()
+    for j in range(0, n_timepoints):
+        s['mean_m_' + str(j)] = mean_m[j]
+    if n_r > 1:
+        std_m = np.sqrt(np.var(y['xs'][:, :, 1], axis=0)).flatten()
+        for j in range(0, n_timepoints):
+            s['std_m_' + str(j)] = std_m[j]
     return s
 
 
@@ -123,7 +136,8 @@ y_obs = get_y_obs()
 
 
 # observed sumstats
-sumstat_obs = sumstat(y_obs)
+sumstat_p_obs = sumstat_p(y_obs)
+sumstat_mp_obs = sumstat_mp(y_obs)
 
 # prior
 limits = {key: (0, 2*rate) for key, rate in p_true.items()}
@@ -132,8 +146,8 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', bounds[0], bounds[1])
 
 # pyabc stuff
 distance = pyabc.AdaptivePNormDistance(p=2)
-# sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=10)
-sampler = pyabc.sampler.RedisEvalParallelSampler(host="wastl", port=8775)
+sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=10)
+#sampler = pyabc.sampler.RedisEvalParallelSampler(host="wastl", port=8775)
 max_nr_populations = 20
 pop_size = 100
 
