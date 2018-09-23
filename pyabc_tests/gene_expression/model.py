@@ -105,7 +105,7 @@ def get_y_raw_obs():
     global _y_raw_obs
     if _y_raw_obs is not None:
         return _y_raw_obs
-    y_raw_file = "y_raw.dat"
+    y_raw_file = "y_raw_" + str(n_r) + ".dat"
     try:
         y_raw_obs = pickle.load(open(y_raw_file, 'rb'))
     except Exception:
@@ -122,7 +122,7 @@ def get_y_obs():
     global _y_obs
     if _y_obs is not None:
         return _y_obs
-    y_file = "y.dat"
+    y_file = "y_" + str(n_r) + ".dat"
     try:
         y_obs = pickle.load(open(y_file, 'rb'))
     except Exception:
@@ -203,12 +203,12 @@ def visualize_y(y):
 
 
 def visualize(label, history):
-    t = history.max_t
-    df, w = history.get_distribution(m=0, t=t)
-    print("t=" + str(t))
-    ax = pyabc.visualization.plot_kde_matrix(
+    for t in range(1, history.max_t + 1):
+        df, w = history.get_distribution(m=0, t=t)
+        print("t=" + str(t))
+        ax = pyabc.visualization.plot_kde_matrix(
             df, w,
             limits=limits,
             refval=p_true)
-    plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
-    plt.close()
+        plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
+        plt.close()
