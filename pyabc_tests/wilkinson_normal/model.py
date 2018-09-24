@@ -65,11 +65,12 @@ pop_size = 500
 
 def visualize(label, history, show_true=True):
     fig, ax = plt.subplots()
+    pops = history.get_all_populations()
     for t in range(0, history.max_t + 1):
         df, w = history.get_distribution(m=0, t=t)
         ax = pyabc.visualization.plot_kde_1d(
             df, w, xmin=prior_lb, xmax=prior_ub,
-            x='th0', numx=200, label="PDF t={}".format(t), 
+            x='th0', numx=200, label="PDF t={} eps={:1.2f}".format(t, np.array(pops['epsilon'])[t+1]), 
             ax=ax)
 
     if show_true:
@@ -86,6 +87,7 @@ def visualize(label, history, show_true=True):
         integral2 = integrate.quad(pdf, prior_lb, prior_ub)[0]
         print(integral, integral2)
         ax.plot(xs, ys, '-', color='0.75', label="True PDF")
-    ax.legend()
+    ax.legend(bbox_to_anchor=(1.05, 1), loc=2)
+    plt.tight_layout()
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
