@@ -12,7 +12,7 @@ import os
 # noise
 std = 1
 # number of replicates
-n_r = 100
+n_r = 1000
 
 
 def model(th):
@@ -64,22 +64,32 @@ pop_size = 500
 
 # visualize
 
-def visualize(label, history, show_true=True):
+def visualize(label, history, show_true=True, legend=True):
     t = history.max_t
+    lb = -0.5
+    ub = 0.5
     df, w = history.get_distribution(m=0, t=t)
-    ax = pyabc.visualization.plot_kde_1d(df, w, xmin=prior_lb, xmax=prior_ub,
-        x='m', numx=200, refval=th_true)
-
+    _, ax = plt.subplots()
+    
     if show_true:
         integral = integrate.quad(pdf_true, prior_lb, prior_ub)[0]
         def pdf(x):
             return pdf_true(x) / integral
 
-        xs = np.linspace(prior_lb, prior_ub, 10000)
+        xs = np.linspace(lb, ub, 10000)
         ys = []
         for x in xs:
             ys.append(pdf(x))
         ax.plot(xs, ys, '-', color='k', alpha=0.75)
+
+    ax = pyabc.visualization.plot_kde_1d(df, w, xmin=lb, xmax=ub,
+        x='m', numx=200, refval=th_true, ax=ax)
+    
+    if legend:
+        if show_true:
+            ax.legend(['true posterior', 'ABC posterior', 'true parameter'])
+        else:
+            ax.legend(['ABC posterior', 'true parameter'])
 
     plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     plt.close()
