@@ -33,8 +33,8 @@ y_obs = 2
 # sumstat
 sumstat_obs = sumstat(y_obs)
 # prior
-prior_lb = -4
-prior_ub = 4
+prior_lb = -3
+prior_ub = 3
 prior = pyabc.Distribution(
     **{'th0': pyabc.RV('uniform', prior_lb, prior_ub - prior_lb)})
 
@@ -58,8 +58,8 @@ def pdf_true(p):
 # pyabc stuff
 distance = pyabc.PNormDistance(p=1)
 sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=6)
-max_nr_populations = 10
-pop_size = 500
+max_nr_populations = 20
+pop_size = 1000
 
 # visualize
 
