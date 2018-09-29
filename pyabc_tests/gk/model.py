@@ -127,6 +127,6 @@ def visualize(label, history):
             limits={key: (prior_lb, prior_ub)
                     for key in p_true},
             refval=p_true)
-    plt.suptitle("Posterior KDE plot")
+    #plt.suptitle("Posterior KDE plot")
     plt.savefig(label + "_kde_matrix_" + str(t) + ".png")
     plt.close()
