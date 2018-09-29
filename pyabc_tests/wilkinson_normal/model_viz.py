@@ -84,12 +84,12 @@ def visualize(label, history, show_true=True):
         df, w = history.get_distribution(m=0, t=t)
         ax = pyabc.visualization.plot_kde_1d(
             df, w, xmin=prior_lb, xmax=prior_ub,
-            x='th0', numx=200, label="t={} eps={:1.3f}".format(t, np.array(pops['epsilon'])[t+1]), 
+            x='th0', numx=200, label="eps={:1.1f}".format(np.array(pops['epsilon'])[t+1]), 
             ax=ax)
-   
-    ax.set_xlabel("theta")
-    ax.legend(bbox_to_anchor=(1.05, 1), loc=2)
-    fig.tight_layout()
-    plt.savefig(label + "_kde_1d_" + str(t) + ".png")
+    
+        ax.set_xlabel("theta")
+        ax.legend(bbox_to_anchor=(1.05, 1), loc=2)
+        fig.tight_layout()
+        plt.savefig(label + "_kde_1d_" + str(t) + ".png")
     
     plt.close()
