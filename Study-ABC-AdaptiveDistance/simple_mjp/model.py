@@ -11,7 +11,7 @@ import copy
 
 
 # number of replicates
-n_r = 10
+n_r = 1
 # true parameter
 # note: translation rate = c>1 * mRNA decay rate
 # 0.01, 0.12, 0.006, 0.0002
