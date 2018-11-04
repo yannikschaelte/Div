@@ -79,7 +79,7 @@ def viz_eps(list_h, list_label):
     for ix, eps_schedule in enumerate(list_eps):
         ax.plot(np.log(eps_schedule[1:]), 'x-', label=list_label[ix])
     plt.xlabel("Population index")
-    plt.ylabel("Log(Epsilon")
+    plt.ylabel("Log(Epsilon)")
     plt.legend()
     plt.savefig("viz_eps.png")
 
