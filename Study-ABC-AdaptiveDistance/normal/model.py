@@ -29,9 +29,12 @@ def model_need_ad(p):
             's1': p['p1'] + 1 * sp.randn(),
             's2': 2 + 100 * sp.randn()}
 
+
 def model_need_bias(p):
     s = model_need_ad(p)
     s['s2'] = 2 + 0.0001 * sp.randn()
+    return s
+
 
 # true model parameter
 p_true = {'p0': 4,
@@ -71,7 +74,7 @@ def visualize(label, history):
     plt.close()
 
 
-def viz_eps(list_h, list_label):
+def viz_eps(label, list_h, list_label):
     list_eps = []
     for h in list_h:
         list_eps.append(np.array(h.get_all_populations()['epsilon']))
@@ -81,12 +84,13 @@ def viz_eps(list_h, list_label):
     plt.xlabel("Population index")
     plt.ylabel("Log(Epsilon)")
     plt.legend()
-    plt.savefig("viz_eps.png")
+    plt.savefig(label + "eps.png")
 
 
-def viz_samples(list_h, list_label):
+def viz_samples(label, list_h, list_label):
     list_samples = []
     for h in list_h:
+        print(h.get_all_populations()['samples'])
         list_samples.append(np.array(h.get_all_populations()['samples']))
     _, ax = plt.subplots()
     for ix, sample_schedule in enumerate(list_samples):
@@ -94,7 +98,7 @@ def viz_samples(list_h, list_label):
     plt.xlabel("Population index")
     plt.ylabel("Log(#Samples)")
     plt.legend()
-    plt.savefig("viz_samples.png")
+    plt.savefig(label + "samples.png")
 
 
 # simulation function
