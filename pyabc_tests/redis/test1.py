@@ -13,4 +13,4 @@ abc = pyabc.ABCSMC(models=model,
 
 db = "sqlite:///db1.db"
 abc.new(db, observed_sum_stat=y_obs)
-abc.run(minimum_epsilon=0.0, max_nr_populations=30, min_acceptance_rate=0.01)
+abc.run(minimum_epsilon=0.0, max_nr_populations=30, min_acceptance_rate=0.001)
