@@ -1,0 +1,13 @@
+defaults : 1000 acceptances, 10000 time points, 1 trajectory
+
+29240: 20 cores MulticoreEval
+36860: 20 cores Redis
+
+
+
+questions:
+* multiple trajectories (=data containers)
+* number of rejections: No (does not change over time)
+* number of cores: Yes (linear)
+* size of data
+* number of acceptances

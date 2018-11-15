@@ -1,10 +1,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import sys
+
 
 vals = []
 
-with open("ymonitor_eaters_RES.log") as f:
+with open("ymonitor_eaters_RES_" + str(sys.argv[1]) + ".log") as f:
     content = f.readlines()
 
 content = [x.strip() for x in content]
@@ -30,4 +32,4 @@ times = np.linspace(1, len(vals), len(vals)) / 3600
 plt.plot(times, np.log10(vals))
 plt.xlabel("Time [h]")
 plt.ylabel("log10(RES [MB])")
-plt.savefig("ymonitor_eaters_RES.png")
+plt.savefig("ymonitor_eaters_RES_" + str(sys.argv[1]) + ".png")
