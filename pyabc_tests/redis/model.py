@@ -22,5 +22,5 @@ def distance(x, y):
 
 
 pop_size = 1000
-redis_sampler = pyabc.sampler.RedisEvalParallelSampler(host="sepp", port=8775)
+redis_sampler = pyabc.sampler.RedisEvalParallelSampler(host="icb-lisa", port=8775)
 multicore_sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=20)
