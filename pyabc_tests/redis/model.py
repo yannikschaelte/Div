@@ -3,8 +3,8 @@ import scipy as sp
 import pyabc
 
 
-n_t = 100
-n_r = 100
+n_t = 10000
+n_r = 1
 
 def model(p):
     return {'y' + str(j) : p['mean'] + np.random.randn(n_t) for j in range(0, n_r)}
