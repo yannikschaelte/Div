@@ -15,7 +15,7 @@ abc = pyabc.ABCSMC(models=model,
                    parameter_priors=prior,
                    distance_function=distance,
                    summary_statistics=sumstat,
-                   sampler=multicore_sampler,
+                   sampler=redis_sampler,
                    population_size=pop_size)
 
 
