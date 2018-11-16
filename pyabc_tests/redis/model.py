@@ -3,10 +3,11 @@ import scipy as sp
 import pyabc
 
 
-n_t = 10000
+n_t = 100
+n_r = 100
 
 def model(p):
-    return {'y': p['mean'] + np.random.randn(n_t)}
+    return {'y' + str(j) : p['mean'] + np.random.randn(n_t) for j in range(0, n_r)}
 
 
 limits = {'mean': (0, 1)}
@@ -14,11 +15,11 @@ prior = pyabc.Distribution(**{key: pyabc.RV('uniform', bounds[0], bounds[1])
                               for key, bounds in limits.items()})
 
 p_true = {'mean': 0.5}
-y_obs = {'y': p_true['mean'] + np.zeros(n_t)}
+y_obs = {'y' + str(j) : p_true['mean'] + np.zeros(n_t) for j in range(0, n_r)}
 
 
 def distance(x, y):
-    return np.power(x['y'] - y['y'], 2).sum()
+    return np.power(x['y0'] - y['y0'], 2).sum()
 
 
 pop_size = 1000
