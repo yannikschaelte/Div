@@ -21,7 +21,10 @@ for x in content:
     elif x.endswith('t'):
         val = int(float(x[:-1]) * 1e9)
     else:
-        val = int(x)
+        try:
+            val = int(x)
+        except Exception:
+            continue
     # print(x, val)
     vals.append(val)
 

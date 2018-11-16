@@ -1,11 +1,11 @@
-defaults : 1000 acceptances, 10000 time points, 1 trajectory
+defaults : 1000 acceptances, 10000 t time points, 1 r trajectory
 
 29240: 20 cores MulticoreEval
 36860: 20 cores Redis
 38836: 20 cores Redis, 1000 t
 22947: 20 cores Redis, 100 t
 24163: 20 cores Redis, 100 t, 100 r
-
+26314: 40 cores Redis
 
 questions:
 * multiple trajectories (=data containers)
