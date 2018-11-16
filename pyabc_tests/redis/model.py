@@ -3,7 +3,7 @@ import scipy as sp
 import pyabc
 
 
-n_t = 10000
+n_t = 50000
 n_r = 1
 
 def model(p):
@@ -22,6 +22,6 @@ def distance(x, y):
     return np.power(x['y0'] - y['y0'], 2).sum()
 
 
-pop_size = 1000
+pop_size = 200
 redis_sampler = pyabc.sampler.RedisEvalParallelSampler(host="icb-lisa", port=8775)
 multicore_sampler = pyabc.sampler.MulticoreEvalParallelSampler(n_procs=20)
