@@ -7,7 +7,7 @@ defaults : 1000 a acceptances, 10000 t time points, 1 r trajectory
 24163: 20 cores Redis, 100 t, 100 r
 26314: 40 cores Redis
 31253: 20 cores Redis, 200 a, 50000 t
-
+28992: 20 cores Redis, R
 questions:
 * multiple trajectories (=data containers)
 * number of rejections: No (does not change over time)
