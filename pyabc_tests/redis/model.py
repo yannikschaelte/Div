@@ -4,8 +4,8 @@ import pyabc
 import time
 
 
-n_t = 10000
-n_r = 1
+n_t = 100
+n_r = 100
 
 def model(p):
     time.sleep(1)
