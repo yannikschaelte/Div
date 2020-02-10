@@ -21,3 +21,6 @@ jobs:
         MY_VAR: Hi there!
       run: |
         echo $MY_VAR.
+        python -m pip install --upgrade pip
+        which python
+        pip install flake8
