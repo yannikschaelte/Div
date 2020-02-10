@@ -5,8 +5,16 @@ on: push
 jobs:
   build:
     name: CI job
+
     runs-on: ubuntu-latest
+      matrix:
+        python-version: [3.7,3.8]
+
     steps:
+    - name: Set up python ${{ matrix.python-version }}
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python-version }}
     - name: Prepare environment
       env:
         MY_VAR: Hi there!
