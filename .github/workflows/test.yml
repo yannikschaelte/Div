@@ -20,6 +20,7 @@ jobs:
       env:
         MY_VAR: Hi there!
       run: |
+        pwd
         echo $MY_VAR.
         python -m pip install --upgrade pip
         which python
